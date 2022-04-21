@@ -48,7 +48,7 @@ x pilot order is set as in lobby and possible JIP
 - only one aircraft that is tuned which means no selection
 - enemies on ground during each run
 - score tracking
-- camera feed at camp
+x camera feed at camp
 
 Functionality for beta should be:
 - game master
@@ -74,6 +74,7 @@ Functionality for release should be:
 //REDO- Every regular non-playing player can only update their preferred aircraft for now
 //REDO- Need a way to pass game master around
 
+//TODO- Add hiscore
 //TODO- Make the server update all the clients so that they see each new run through the observer screen
 //TODO- Game master needs to retain the option of starting the interface between deaths
 //TODO- Build system that keeps track of current game state
@@ -89,13 +90,14 @@ canyonRun_var_pilot = 0;
 canyonRun_var_aircraft = 0;
 canyonRun_var_pilot = player;
 canyonRun_var_scenarioLive = false;	// variable to start the scenario
-
+canyonRun_var_goFlight = false; // Used for starting a run
 
 
 
 // Functions to be compiled
 canyonRun_fnc_compileAll = {
 
+	canyonRun_core_mainLoop = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_mainLoop.sqf";
 	canyonRun_fnc_playerManagement = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerManagement.sqf";
 	canyonRun_fnc_debug = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_debug.sqf";
 	canyonRun_fnc_planeList = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_planeList.sqf";
@@ -173,11 +175,10 @@ if (isServer) then {	// run on dedicated server or player host
 	}; // End of single player specific code
 
 
-
+// This is where the gameplay loop should kick off
+[] call canyonRun_core_mainLoop;
 
 };	// End of server-side only executed code
-
-
 
 
 
@@ -199,8 +200,6 @@ if (hasInterface) then {	// run on all player clients incl. player host
 			sleep 1;
 		};
 	};
-
-
 
 
 
@@ -239,15 +238,11 @@ if (hasInterface) then {	// run on all player clients incl. player host
 
 
 
-
-
 	// TEMPORARY: Should probably only be executed by the game master even though each player need to be able to choose aircraft
 	// Set the scenario loose by setting the varible to true and broadcasting it to all clients
 	canyonRun_var_spawnFlag addAction ["start scenario",{
 		missionNamespace setVariable ["canyonRun_var_scenarioLive", true, true];
 	}];
-
-
 
 
 };	// End of hasInterface executed code
@@ -260,12 +255,4 @@ canyonRun_fnc_outOfBounds = {
 	systemChat "out of bounds";
 };
 
-// Halt the loading of the scenario code until someone initializes it
-waitUntil {canyonRun_var_scenarioLive};
 
-
-// This is where the gameplay loop should kick off
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -25,35 +25,14 @@ KK_fnc_setDirFLY = {
 
 
 
+// Get the current pilot data at the beginning of the run
+_pilot      = canyonRun_var_playerList select 0;
+_name       = canyonRun_var_playerList select 1;
+_aircraft   = canyonRun_var_playerList select 2;
+_points     = canyonRun_var_playerList select 3;
 
-
-// Reset the flightPoints
-canyonrun_var_flightPoints = 0;
-
-
-
-
-
-
-
-// Set up enemies
-[] call canyonRun_fnc_enemyStart;
-
-
-
-
-
-
-
-private _pilot 	    = _this select 0;
-private _aircraft 	= _this select 1;
-
-
-
-
-
-
-
+// Reset points counter of the current flight
+_flightPoints = 0;
 
 
 
@@ -70,10 +49,6 @@ canyonRun_aircraft = _aircraftObject;
 
 // Put the player into the cockpit
 (_pilot select 1) moveInDriver _aircraftObject;
-
-// Activate the observer screen for the current pilot
-[_pilot,_aircraftObject] remoteExec ["canyonRun_fnc_observerScreen"]; 
-
 
 // Give the player a few seconds to set throttle
 sleep 3;

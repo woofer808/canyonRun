@@ -18,7 +18,6 @@ if (!isServer) exitWith {
 missionNamespace setVariable ["canyonRun_var_playerList", [], true];
 
 
-
 // Populate the list for the first time but do not count headless clients
 private _onlyPlayers = call BIS_fnc_listPlayers;
 {
