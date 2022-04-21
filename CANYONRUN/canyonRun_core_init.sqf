@@ -7,15 +7,14 @@
 *	run a low-altitude gauntlet of anti-air units with limited fuel.
 *
 *	Definitions:
-*	- Scene: A predefined camera angle with camera movement along with take time, fov and so on.
 *	- Variable names: canyonRun_var_variableName
 *	- Function and script names: canyonRun_fnc_functionOrScriptName(.sqf)
 *	- Object names: canyonRun_objectName
 *
-*	Game loop:
+*	Game idea:
 *	You have a broken fuel pump. The more gas you give, the more fuel gets dumped overboard.
 *	To make things worse, you are in hostile territory where enemies are testing their Anti-air laser systems.
-
+*
 *	- Don't raise above 200m above ground or you'll get insta-lazored.
 *	- Don't go into the testing zones outside of the canyon or get burninated.
 *	- Don't give too much throttle, or you'll loose your fuel before getting out.
@@ -29,11 +28,11 @@
 
 /* ------------------------------ PROJECT PLAN ----------------------------------------
 The game loop:
-Fly through the terrain while loosing fuel as far through the maze as possible,
+Fly through the terrain while loosing fuel as far through the maze as possible
 without crashing, going out of bounds or being shot down.
 
 What makes it fun:
-Made to play as a party game where you get to watch each friend's run together through
+Made to play as a party game where everybody get to watch each friend's run together through
 an in-game provided follow camera.
 
 What makes it last:
@@ -41,10 +40,10 @@ Editor skilled game masters can change up the route or enemy configuration betwe
 
 ----------------------------------- ROADMAP --------------------------------------------
 Functionality for alpha should be:
-- locality written for MP from the ground up, the server is boss
+x locality written for MP from the ground up, the server is boss
 - load into the scenario without issue
-- pilot order is set as in lobby and possible JIP
-- option to start mission at the beginning
+x pilot order is set as in lobby and possible JIP
+- option to start mission at the beginning on the flag
 - one minute between automated runs, no manual starts at will
 - only one aircraft that is tuned which means no selection
 - enemies on ground during each run
@@ -56,6 +55,7 @@ Functionality for beta should be:
 - GUI for game master
 - several aircraft
 - GUI for players selection of aircraft
+- GUI for changing player queue order by game master
 - instructions in diary
 - markers/explanations on map
 - instructions in camp
@@ -88,7 +88,7 @@ canyonRun_var_devMode = true;
 canyonRun_var_pilot = 0;
 canyonRun_var_aircraft = 0;
 canyonRun_var_pilot = player;
-
+canyonRun_var_scenarioLive = false;	// variable to start the scenario
 
 
 
@@ -241,9 +241,11 @@ if (hasInterface) then {	// run on all player clients incl. player host
 
 
 
-// TEMPORARY: Should probably only be executed by the game master even though each player need to be able to choose aircraft
-// Give the spawn flag option to start the run
-canyonRun_var_spawnFlag addAction ["run",{_handle=createdialog "canyonRun_gui_dialogMain"}];
+	// TEMPORARY: Should probably only be executed by the game master even though each player need to be able to choose aircraft
+	// Set the scenario loose by setting the varible to true and broadcasting it to all clients
+	canyonRun_var_spawnFlag addAction ["start scenario",{
+		missionNamespace setVariable ["canyonRun_var_scenarioLive", true, true];
+	}];
 
 
 
@@ -257,3 +259,13 @@ canyonRun_fnc_outOfBounds = {
 	canyonRun_pilot setdamage 10;
 	systemChat "out of bounds";
 };
+
+// Halt the loading of the scenario code until someone initializes it
+waitUntil {canyonRun_var_scenarioLive};
+
+
+// This is where the gameplay loop should kick off
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
