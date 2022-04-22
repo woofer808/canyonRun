@@ -25,7 +25,9 @@ while {canyonRun_var_scenarioLive} do {
 			sleep 1;
 		};
 		hintSilent ""; // Clear the hint
-		canyonRun_var_goFlight = true;
+
+		// Let the client know there is now a canyon run going
+		canyonRun_var_activeRun = true;
 	}] call canyonRun_fnc_clientCode;
 
 
@@ -37,13 +39,13 @@ while {canyonRun_var_scenarioLive} do {
 	// While we are waiting for the countdown, set up enemies
 	[] spawn canyonRun_fnc_enemyStart;
 
-	waitUntil {canyonRun_var_goFlight};
+	waitUntil {canyonRun_var_activeRun};
 
 	// Now that we counted down, it's time to start the run
 	[] spawn canyonRun_fnc_startFlight;
 
-	// This is the part where we do all the flying and points counting 
-
+	// This is the part where we do all the flying and points counting
+	waitUntil {!canyonRun_var_activeRun};
 
 	// Do all that is needed to end the run
 	[] call canyonRun_fnc_startFlight;

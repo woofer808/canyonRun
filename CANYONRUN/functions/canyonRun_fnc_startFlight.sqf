@@ -54,4 +54,4 @@ canyonRun_aircraft = _aircraftObject;
 sleep 3;
 
 // Get the fuel leak going
-[] execVM "CANYONRUN\functions\canyonRun_fnc_fuelLeak.sqf";
+[] spawn "CANYONRUN\functions\canyonRun_fnc_fuelLeak.sqf";
