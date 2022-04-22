@@ -31,21 +31,32 @@ while {canyonRun_var_scenarioLive} do {
 	}] call canyonRun_fnc_clientCode;
 
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 
 	// While we are waiting for the countdown, set up enemies
-	[] spawn canyonRun_fnc_enemyStart;
+	[] call canyonRun_fnc_enemyStart;
 
 	waitUntil {canyonRun_var_activeRun};
 
 	// Now that we counted down, it's time to start the run
-	[] spawn canyonRun_fnc_startFlight;
+	[] call canyonRun_fnc_startFlight;
 
 	// This is the part where we do all the flying and points counting
 	waitUntil {!canyonRun_var_activeRun};
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+/*
+A few tings to investigate:
+- Will the server be able to easily set the fuel of the target aircraft? Should function run on client?
+- Attaching the smoke shells on the aircraft will probably have to be done locally by the client
+- Should I have the target client spawn the aircraft or will moveInDriver fix locality for us?
+
+Should each client have the function startFlight and be made to run it?
+*/
+
+
 
 	// Do all that is needed to end the run
 	[] call canyonRun_fnc_startFlight;

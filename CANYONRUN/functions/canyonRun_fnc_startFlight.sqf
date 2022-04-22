@@ -26,18 +26,13 @@ KK_fnc_setDirFLY = {
 
 
 // Get the current pilot data at the beginning of the run
-_pilot      = canyonRun_var_playerList select 0;
+_pilot      = canyonRun_var_playerList select 0; // UID of the pilot
 _name       = canyonRun_var_playerList select 1;
 _aircraft   = canyonRun_var_playerList select 2;
 _points     = canyonRun_var_playerList select 3;
+_hiScore    = canyonRun_var_playerList select 4;
 
-// Reset points counter of the current flight
-_flightPoints = 0;
-
-
-
-
-
+canyonRun_var_currentPilot = _pilot;    // Store for easy access during the run
 
 // Spawn aircraft at the starting location and make it fly
 _aircraftObject = createVehicle [_aircraft, getPos startLocation, [], 0, "FLY"];
@@ -50,8 +45,9 @@ canyonRun_aircraft = _aircraftObject;
 // Put the player into the cockpit
 (_pilot select 1) moveInDriver _aircraftObject;
 
-// Give the player a few seconds to set throttle
-sleep 3;
-
-// Get the fuel leak going
-[] spawn "CANYONRUN\functions\canyonRun_fnc_fuelLeak.sqf";
+[] spawn {
+    // Give the player a few seconds to set throttle
+    sleep 3;
+    // Get the fuel leak going
+    [] call canyonRun_fnc_fuelLeak.sqf";
+};

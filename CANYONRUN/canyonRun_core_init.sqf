@@ -48,6 +48,7 @@ x pilot order is set as in lobby and possible JIP
 - only one aircraft that is tuned which means no selection
 - enemies on ground during each run
 - score tracking
+- hiscore tracking
 x camera feed at camp
 
 Functionality for beta should be:
@@ -69,12 +70,8 @@ Functionality for release should be:
 
 -------------------------------------------------------------------------------------- */
 
-//REDO- Do we want a game master or should there be a timed automated pass-around of controls. Need a way to minimize griefing
-//REDO- Make it so that every round start and stop is done by the server
-//REDO- Every regular non-playing player can only update their preferred aircraft for now
-//REDO- Need a way to pass game master around
-
-//TODO- Add hiscore
+//TODO- Add highscore
+//TODO- Currently the scripts are compiled on all clients
 //TODO- Make the server update all the clients so that they see each new run through the observer screen
 //TODO- Game master needs to retain the option of starting the interface between deaths
 //TODO- Build system that keeps track of current game state
@@ -94,7 +91,7 @@ canyonRun_var_goFlight = false; // Used for starting a run
 
 
 
-// Functions to be compiled
+// Functions to be compiled, currently done on all clients but might be wise to move to server
 canyonRun_fnc_compileAll = {
 	if (!canyonRun_var_devMode) then {
 		canyonRun_core_mainLoop = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_mainLoop.sqf";
@@ -107,6 +104,10 @@ canyonRun_fnc_compileAll = {
 		canyonRun_fnc_enemies = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_enemies.sqf";
 		canyonRun_fnc_observerScreen = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_observerScreen.sqf";
 		canyonRun_fnc_score = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_score.sqf";
+
+		if (canyonRun_var_debug) then {
+			["scripts compiled"] call canyonRun_fnc_debug;
+		};
 	};
 };
 [] call canyonRun_fnc_compileAll;
