@@ -17,13 +17,13 @@ class EditorData
 	class Camera
 	{
 		pos[]={3896.2664,412.72577,1079.1577};
-		dir[]={-0.61563206,-0.57336885,0.54065526};
-		up[]={-0.43081626,0.81929702,0.37834781};
-		aside[]={0.6598857,-8.7916851e-007,0.75140005};
+		dir[]={-0.6156128,-0.57335079,0.54063833};
+		up[]={-0.43080404,0.81931001,0.37833714};
+		aside[]={0.65987027,-1.4901161e-008,0.75137955};
 	};
 };
 binarizationWanted=0;
-sourceName="[06]-CanyonRun";
+sourceName="CanyonRun";
 addons[]=
 {
 	"A3_Misc_F_Helpers",
@@ -3023,7 +3023,7 @@ class Mission
 			class PositionInfo
 			{
 				position[]={3880.5076,407.7489,1091.4171};
-				angles[]={0,5.5927467,-0};
+				angles[]={0,5.5927467,0};
 			};
 			side="Empty";
 			flags=5;

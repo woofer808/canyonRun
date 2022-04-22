@@ -1,3 +1,4 @@
+
 /*
 *										Canyon Run, by woofer.
 *
@@ -78,6 +79,7 @@ Functionality for release should be:
 //TODO- Camera should always run, but be aimed at the current aircraft
 //IDEA- Make camera use different spots for each section of the circuit
 //IDEA- TFAR pre-configured channels for aircraft and radios on pilots
+//TODO- CBA option for exiting camera
 
 
 // Debug and development mode switches
@@ -93,22 +95,22 @@ canyonRun_var_goFlight = false; // Used for starting a run
 
 // Functions to be compiled, currently done on all clients but might be wise to move to server
 canyonRun_fnc_compileAll = {
-	if (!canyonRun_var_devMode) then {
-		canyonRun_core_mainLoop = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_mainLoop.sqf";
-		canyonRun_fnc_playerManagement = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerManagement.sqf";
-		canyonRun_fnc_debug = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_debug.sqf";
-		canyonRun_fnc_planeList = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_planeList.sqf";
-		canyonRun_fnc_fuelLeak = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_fuelLeak.sqf";
-		canyonRun_fnc_startFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_startFlight.sqf";
-		canyonRun_fnc_endFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_endFlight.sqf";
-		canyonRun_fnc_enemies = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_enemies.sqf";
-		canyonRun_fnc_observerScreen = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_observerScreen.sqf";
-		canyonRun_fnc_score = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_score.sqf";
 
-		if (canyonRun_var_debug) then {
-			["scripts compiled"] call canyonRun_fnc_debug;
-		};
+	canyonRun_core_mainLoop = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_mainLoop.sqf";
+	canyonRun_fnc_playerManagement = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerManagement.sqf";
+	canyonRun_fnc_debug = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_debug.sqf";
+	canyonRun_fnc_planeList = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_planeList.sqf";
+	canyonRun_fnc_fuelLeak = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_fuelLeak.sqf";
+	canyonRun_fnc_startFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_startFlight.sqf";
+	canyonRun_fnc_endFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_endFlight.sqf";
+	canyonRun_fnc_enemies = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_enemies.sqf";
+	canyonRun_fnc_observerScreen = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_observerScreen.sqf";
+	canyonRun_fnc_score = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_score.sqf";
+
+	if (canyonRun_var_debug) then {
+		["scripts compiled"] call canyonRun_fnc_debug;
 	};
+
 };
 [] call canyonRun_fnc_compileAll;
 
@@ -116,12 +118,11 @@ canyonRun_fnc_compileAll = {
 canyonRun_var_missionGo = false;		// Used to initialize mission on all clients to let server do the startup
 
 
-
 if (isServer) then {	// run on dedicated server or player host
 	
 	[] call canyonRun_fnc_playerManagement; // This will take proper action when people join or leave the session
 
-	/*	
+	/*
 	*
 	*	The server will generate a list of available aircraft and broadcast that to all the clients.
 	*
@@ -175,12 +176,10 @@ if (isServer) then {	// run on dedicated server or player host
 		{deleteVehicle _x} forEach ([p0,p1,p2,p3,p4,p5,p6,p7,p8,p9] - [player]);
 	}; // End of single player specific code
 
-
-// This is where the gameplay loop should kick off
-[] call canyonRun_core_mainLoop;
+	// This is where the gameplay loop should kick off
+	[] spawn canyonRun_core_mainLoop;
 
 };	// End of server-side only executed code
-
 
 
 if (hasInterface) then {	// run on all player clients incl. player host
@@ -213,7 +212,7 @@ if (hasInterface) then {	// run on all player clients incl. player host
 	// Set the screen texture to the image stream from the camera
 	canyonRun_var_screen setObjectTexture [0, "#(argb,512,512,1)r2t(stream,1)"];
 
-	/* create camera and stream to render surface */
+	// create camera and stream to render surface
 	canyonRun_var_camera = "camera" camCreate (canyonRun_var_spawnFlag modelToWorld [20,15,10]);
 	canyonRun_var_camera cameraEffect ["Internal", "Back", "stream"];
 	"stream" setPiPEffect [0];			// Set the proper camera effect
