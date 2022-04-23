@@ -26,8 +26,12 @@ _code = {hint "hello";sleep 1;hint "";};
 
 
  private _target = _this select 0;	// UID of target client OR clientID integer
- private _code = this select 1;		// Code passed which will be converted into a string
+ private _code = _this select 1;		// Code passed to this function
 
+// In the future, rewrite this so that this section just converts handy string input into clientID
+if (typeName _target == "string") exitWith {
+	systemchat "CANYONRUN: Can't remoteExec with a string target. Give clientID or UID.";
+};
 
 // If the function is passed a UID, find the target machine clientID of that UID
 if (_target > 99) then {
@@ -47,4 +51,4 @@ if (_target > 99) then {
 // Pass a piece of code to the indicated target machine and spawn it there
 {
 	[] spawn _code;
-} remoteExec ["call", _target]; // Confirmed to work just as well in SP
+} remoteExec ["call", _target]; // Confirmed to work just as well in SP (clientID == 0)

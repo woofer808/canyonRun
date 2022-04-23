@@ -82,6 +82,21 @@ Functionality for release should be:
 //TODO- CBA option for exiting camera
 
 
+// ----------------------------------CURRENTLY AT:--------------------------------------
+// ----------------------------------CURRENTLY AT:--------------------------------------
+/* 
+
+Mission now starts to count down on canyonRun_var_scenarioLive=true
+next step is to start spawning aircraft and putting a pilot in there
+
+*/
+// ----------------------------------CURRENTLY AT:--------------------------------------
+// ----------------------------------CURRENTLY AT:--------------------------------------
+
+
+
+
+
 // Debug and development mode switches
 canyonRun_var_debug = true;
 canyonRun_var_devMode = true;
@@ -90,7 +105,7 @@ canyonRun_var_aircraft = 0;
 canyonRun_var_pilot = player;
 canyonRun_var_scenarioLive = false;	// variable to start the scenario
 canyonRun_var_goFlight = false; // Used for starting a run
-
+canyonRun_var_activeRun = false; // Used to indicate wether there is an active run currently going on
 
 
 // Functions to be compiled, currently done on all clients but might be wise to move to server
@@ -106,6 +121,9 @@ canyonRun_fnc_compileAll = {
 	canyonRun_fnc_enemies = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_enemies.sqf";
 	canyonRun_fnc_observerScreen = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_observerScreen.sqf";
 	canyonRun_fnc_score = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_score.sqf";
+	canyonRun_core_clientCode = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_clientCode.sqf";
+
+
 
 	if (canyonRun_var_debug) then {
 		["scripts compiled"] call canyonRun_fnc_debug;
@@ -190,17 +208,6 @@ if (hasInterface) then {	// run on all player clients incl. player host
 	[] execVM "CANYONRUN\canyonRun_gui\canyonRun_gui_init.sqf";
 
 	
-	// This is a debug counter for current number of units on the terrain thay only runs on mission start
-	[] spawn {
-		if canyonRun_var_debug then {
-			while {canyonRun_var_debug == true} do {
-			_blueUnits 	= count (allUnits select {side _x == west});
-			_redUnits 	= count (allUnits select {side _x == east});
-			hintSilent format ["Unit count west: %1, east: %2", _blueUnits, _redUnits]};
-			sleep 1;
-		};
-	};
-
 
 
 	// ---------------------------------------------------------------------

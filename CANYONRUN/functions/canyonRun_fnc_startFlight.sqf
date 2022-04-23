@@ -26,11 +26,11 @@ KK_fnc_setDirFLY = {
 
 
 // Get the current pilot data at the beginning of the run
-_pilot      = canyonRun_var_playerList select 0; // UID of the pilot
-_name       = canyonRun_var_playerList select 1;
-_aircraft   = canyonRun_var_playerList select 2;
-_points     = canyonRun_var_playerList select 3;
-_hiScore    = canyonRun_var_playerList select 4;
+_pilot      = (canyonRun_var_playerList select 0) select 0; // UID of the pilot
+_name       = (canyonRun_var_playerList select 0) select 1;
+_aircraft   = (canyonRun_var_playerList select 0) select 2;
+_points     = (canyonRun_var_playerList select 0) select 3;
+_hiScore    = (canyonRun_var_playerList select 0) select 4;
 
 canyonRun_var_currentPilot = _pilot;    // Store for easy access during the run
 

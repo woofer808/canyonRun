@@ -28,7 +28,7 @@ while {canyonRun_var_scenarioLive} do {
 
 		// Let the client know there is now a canyon run going
 		canyonRun_var_activeRun = true;
-	}] call canyonRun_fnc_clientCode;
+	}] call canyonRun_core_clientCode;
 
 
 
@@ -42,10 +42,6 @@ while {canyonRun_var_scenarioLive} do {
 
 	// This is the part where we do all the flying and points counting
 	waitUntil {!canyonRun_var_activeRun};
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!THIS IS WHERE WE ARE AT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 /*
 A few tings to investigate:
