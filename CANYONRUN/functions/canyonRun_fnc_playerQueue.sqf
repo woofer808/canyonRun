@@ -1,8 +1,8 @@
 /*
 *	This function is responsible for maintaining the player queue
 *
-*	[_uid,true,false] call canyonRun_fnc_playerQeue; // Move player of this UID to first in queue
-*	[_uid,false,true] call canyonRun_fnc_playerQeue; // Move player of this UID to last in queue
+*	[_uid,true,false] call canyonRun_fnc_playerQuSeue; // Move player of this UID to first in queue
+*	[_uid,false,true] call canyonRun_fnc_playerQueue; // Move player of this UID to last in queue
 *
 */
 

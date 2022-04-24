@@ -64,6 +64,7 @@ Functionality for beta should be:
 - scoreboard
 - win condition or max score condition
 - suggestions
+- map tracking
 
 Functionality for release should be:
 - as many aircraft configured as possible
@@ -80,14 +81,17 @@ Functionality for release should be:
 //IDEA- Make camera use different spots for each section of the circuit
 //IDEA- TFAR pre-configured channels for aircraft and radios on pilots
 //TODO- CBA option for exiting camera
+//TODO- Mark player crashes on the map
+//TODO- Make sure pilots can't either bail or that they lose their run if they do
 
 
 // ----------------------------------CURRENTLY AT:--------------------------------------
 // ----------------------------------CURRENTLY AT:--------------------------------------
 /* 
 
-Mission now starts to count down on canyonRun_var_scenarioLive=true
-next step is to start spawning aircraft and putting a pilot in there
+Mission no longer spawns the countdown properly at least in MP, get on that first
+Then finish the game looop stuff.
+For now we want to be able to do the fly-crash-respawn-wait loop
 
 */
 // ----------------------------------CURRENTLY AT:--------------------------------------
@@ -113,6 +117,7 @@ canyonRun_fnc_compileAll = {
 
 	canyonRun_core_mainLoop = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_mainLoop.sqf";
 	canyonRun_fnc_playerManagement = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerManagement.sqf";
+	canyonRun_fnc_playerQueue = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerQueue.sqf";
 	canyonRun_fnc_debug = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_debug.sqf";
 	canyonRun_fnc_planeList = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_planeList.sqf";
 	canyonRun_fnc_fuelLeak = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_fuelLeak.sqf";

@@ -8,6 +8,9 @@ Params: [ BIS_fnc_simpleObjectData , _aircraft ]
 Return: [ none ]										
 */
 
+systemChat "startFlight ran";
+
+
 // http://killzonekid.com/arma-scripting-tutorials-kk_fnc_setdirfly/
 KK_fnc_setDirFLY = {
     private ["_veh","_dir","_v"];
@@ -23,16 +26,18 @@ KK_fnc_setDirFLY = {
 };
 
 
-
-
 // Get the current pilot data at the beginning of the run
-_pilot      = (canyonRun_var_playerList select 0) select 0; // UID of the pilot
+_pilotUID   = (canyonRun_var_playerList select 0) select 0; // UID of the pilot
 _name       = (canyonRun_var_playerList select 0) select 1;
 _aircraft   = (canyonRun_var_playerList select 0) select 2;
 _points     = (canyonRun_var_playerList select 0) select 3;
 _hiScore    = (canyonRun_var_playerList select 0) select 4;
 
-canyonRun_var_currentPilot = _pilot;    // Store for easy access during the run
+_pilot = canyonRun_var_currentPilot;
+
+// Now we are actually ready to reorder the player list so that we get the next dude in line correctly
+// In case someone wants to manipulate the order during someone else's run
+[_pilotUID,false,true] call canyonRun_fnc_playerQueue; // Move player of this UID to last in queue
 
 // Spawn aircraft at the starting location and make it fly
 _aircraftObject = createVehicle [_aircraft, getPos startLocation, [], 0, "FLY"];
@@ -43,11 +48,39 @@ canyonRun_aircraft = _aircraftObject;
 [_aircraftObject, 60] call KK_fnc_setDirFLY;
 
 // Put the player into the cockpit
-(_pilot select 1) moveInDriver _aircraftObject;
+_pilot moveInDriver _aircraftObject;
 
-[] spawn {
-    // Give the player a few seconds to set throttle
-    sleep 3;
-    // Get the fuel leak going
-    [] call canyonRun_fnc_fuelLeak.sqf";
+
+
+// ---------------------------------------- ENDSTATES ----------------------------------------
+
+// When unit is killed
+_pilot addEventHandler ["Killed", {
+	params ["_unit", "_killer"];
+    // Code here that will execute on triggering of this EH
+    [] spawn canyonRun_fnc_endFlight;
+    // Should probably clean the EH up here immediately
+    _unit removeEventHandler [_thisEvent, _thisEventHandler];
+}];
+
+// When a pilot gets out of aircraft, bails or disconnects
+// If assigned to aircraft, use GetOut here
+_pilot addEventHandler ["GetOutMan", {
+	params ["_unit", "_role", "_vehicle", "_turret"];
+    // Code here that will execute on triggering of this EH
+    [] spawn canyonRun_fnc_endFlight;
+    // Should probably clean the EH up here immediately
+    _unit removeEventHandler [_thisEvent, _thisEventHandler];
+}];
+
+// When a pilot achieves the win condition
+canyonRun_fnc_winCondition = {
+    // Some code for checking for that or we'll make the goal execute the event
+    [] spawn canyonRun_fnc_endFlight;
 };
+
+
+
+// ---------------------------------------- Active run state ----------------------------------------
+// Now we are airborne and all tracking is set up
+// This is the part where we do all the flying and points counting

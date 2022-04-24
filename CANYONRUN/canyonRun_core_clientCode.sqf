@@ -25,6 +25,7 @@ _code = {hint "hello";sleep 1;hint "";};
 ------------------------------------------------------------------------------------ */
 
 
+
  private _target = _this select 0;	// UID of target client OR clientID integer
  private _code = _this select 1;		// Code passed to this function
 
@@ -49,6 +50,4 @@ if (_target > 99) then {
 
 
 // Pass a piece of code to the indicated target machine and spawn it there
-{
-	[] spawn _code;
-} remoteExec ["call", _target]; // Confirmed to work just as well in SP (clientID == 0)
+[_code] remoteExec ["spawn",_target]; // Not confirmed in SP

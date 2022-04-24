@@ -20,8 +20,10 @@ while {canyonRun_var_scenarioLive} do {
 		// First we need a countdown timer between runs
 		// Let's display it as a hint for now,
 		// but would look nicer as a message every ten seconds before counting down the last few seconds.
-		for "_i" from 60 to 0 step -1 do {
-			hintSilent format ["Time until next run: %1 seconds", _i];
+
+		for "_i" from 10 to 0 step -1 do {
+			_pilotName = (canyonRun_var_playerList select 0) select 1;
+			hintSilent format ["Next pilot %1 to start in %2 seconds", _pilotName,_i];
 			sleep 1;
 		};
 		hintSilent ""; // Clear the hint
@@ -30,31 +32,17 @@ while {canyonRun_var_scenarioLive} do {
 		canyonRun_var_activeRun = true;
 	}] call canyonRun_core_clientCode;
 
-
-
-	// While we are waiting for the countdown, set up enemies
-	[] call canyonRun_fnc_enemyStart;
-
 	waitUntil {canyonRun_var_activeRun};
 
 	// Now that we counted down, it's time to start the run
-	[] call canyonRun_fnc_startFlight;
-
-	// This is the part where we do all the flying and points counting
-	waitUntil {!canyonRun_var_activeRun};
-
-/*
-A few tings to investigate:
-- Will the server be able to easily set the fuel of the target aircraft? Should function run on client?
-- Attaching the smoke shells on the aircraft will probably have to be done locally by the client
-- Should I have the target client spawn the aircraft or will moveInDriver fix locality for us?
-
-Should each client have the function startFlight and be made to run it?
-*/
+	_pilotUID   = (canyonRun_var_playerList select 0) select 0; // UID of the pilot
+	_pilot = _pilotUID call BIS_fnc_getUnitByUID;	
+	
+	canyonRun_var_currentPilot = _pilot; // Store for easy access during the run
+		
+	[] spawn canyonRun_fnc_startFlight;
 
 
-
-	// Do all that is needed to end the run
-	[] call canyonRun_fnc_startFlight;
 
 }; // End of main loop
+

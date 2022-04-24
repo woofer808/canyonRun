@@ -23,7 +23,7 @@ private _onlyPlayers = call BIS_fnc_listPlayers;
 {
 	_uid = getPlayerUID _x;																// Player UID as string to pinpoint a player
 	_name = name _x;																	// The name as a string
-	_selectedAircraft = "B_Plane_Fighter_01_F";											// This aircraft is assigned by default
+	_selectedAircraft = "I_Plane_fighter_04_F";											// This aircraft is assigned by default
 	_score = 0;																			// Score of current/last run
 	_highScore = 0;																		// The highest score achieved during a run
 	canyonRun_var_playerList pushBack [_uid,_name,_selectedAircraft,_score,_highScore];	// Add to the list
@@ -55,7 +55,7 @@ addMissionEventHandler ["PlayerConnected",
 {
 	params ["_id", "_uid", "_name", "_jip", "_owner", "_idstr"]; // This comes from the eventhandler
 
-	_selectedAircraft = "B_Plane_Fighter_01_F";					// This aircraft is assigned by default
+	_selectedAircraft = "I_Plane_fighter_04_F";					// This aircraft is assigned by default
 	_score = 0;
 
 	
