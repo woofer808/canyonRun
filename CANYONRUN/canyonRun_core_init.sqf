@@ -127,6 +127,7 @@ canyonRun_fnc_compileAll = {
 	canyonRun_fnc_observerScreen = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_observerScreen.sqf";
 	canyonRun_fnc_score = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_score.sqf";
 	canyonRun_core_clientCode = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_clientCode.sqf";
+	fnc_test = compile preprocessFileLineNumbers "CANYONRUN\test.sqf";
 
 
 
