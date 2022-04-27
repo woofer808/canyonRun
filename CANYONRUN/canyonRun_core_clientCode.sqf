@@ -62,10 +62,13 @@ if (_target > 999) then {
 // Wait, what if we store the code in a var and push that before execuiting it?
 canyonRun_fnc_clientFunction = _code;
 // Apparently using 0 as target doesn't work with client version.
-//Need an if statement to account for that
+// Need an if statement to account for that
 if (_target == 0) then {
 	publicVariable "canyonRun_fnc_clientFunction";
 } else {
 	_target publicVariableClient "canyonRun_fnc_clientFunction";
 };
-remoteExec ["canyonRun_fnc_clientFunction",_target]; // Confirmed working in player hosted MP
+remoteExec ["canyonRun_fnc_clientFunction",_target]; // Confirmed working in player hosted LAN MP
+
+// There is a question remaining whether there will be timing issues between server and client
+// Problem for a later date though.

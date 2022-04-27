@@ -83,15 +83,15 @@ Functionality for release should be:
 //TODO- CBA option for exiting camera
 //TODO- Mark player crashes on the map
 //TODO- Make sure pilots can't either bail or that they lose their run if they do
+//TODO- Player that starts a flight need to have their observation camera shut down if they are in it
 
 
 // ----------------------------------CURRENTLY AT:--------------------------------------
 // ----------------------------------CURRENTLY AT:--------------------------------------
 /* 
 
-Mission no longer spawns the countdown properly at least in MP, get on that first
-Then finish the game looop stuff.
-For now we want to be able to do the fly-crash-respawn-wait loop
+Currently the game loop is functioning in MP singleplayer
+Next is to make the points counting and fuel leak work
 
 */
 // ----------------------------------CURRENTLY AT:--------------------------------------
@@ -127,7 +127,7 @@ canyonRun_fnc_compileAll = {
 	canyonRun_fnc_observerScreen = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_observerScreen.sqf";
 	canyonRun_fnc_score = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_score.sqf";
 	canyonRun_core_clientCode = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_clientCode.sqf";
-	fnc_test = compile preprocessFileLineNumbers "CANYONRUN\test.sqf";
+	fnc_test = compile preprocessFileLineNumbers "CANYONRUN\fnc_test.sqf";
 
 
 
@@ -255,6 +255,8 @@ if (hasInterface) then {	// run on all player clients incl. player host
 	// Set the scenario loose by setting the varible to true and broadcasting it to all clients
 	canyonRun_var_spawnFlag addAction ["start scenario",{
 		missionNamespace setVariable ["canyonRun_var_scenarioLive", true, true];
+		["Senario is LIVE"] remoteExec ["systemchat",0];
+		removeAllActions canyonRun_var_spawnFlag;
 	}];
 
 

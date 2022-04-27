@@ -2,13 +2,16 @@
 Canyon run, by woofer.
 canyonrun_fnc_startFlight
 
-Starts the run for the given player and aircraft.		
+Starts the run for the given player and aircraft and handles all events during the run
 
 Params: [ BIS_fnc_simpleObjectData , _aircraft ]							
 Return: [ none ]										
 */
 
 systemChat "startFlight ran";
+
+
+private _pilot = _this select 0;    // Pilot unit passed to this function
 
 
 // http://killzonekid.com/arma-scripting-tutorials-kk_fnc_setdirfly/
@@ -35,9 +38,17 @@ _hiScore    = (canyonRun_var_playerList select 0) select 4;
 
 _pilot = canyonRun_var_currentPilot;
 
+
 // Now we are actually ready to reorder the player list so that we get the next dude in line correctly
 // In case someone wants to manipulate the order during someone else's run
 [_pilotUID,false,true] call canyonRun_fnc_playerQueue; // Move player of this UID to last in queue
+
+
+private _endRun = false;
+
+
+
+// ------------------------------------- Put pilot in plane -------------------------------------
 
 // Spawn aircraft at the starting location and make it fly
 _aircraftObject = createVehicle [_aircraft, getPos startLocation, [], 0, "FLY"];
@@ -58,7 +69,7 @@ _pilot moveInDriver _aircraftObject;
 _pilot addEventHandler ["Killed", {
 	params ["_unit", "_killer"];
     // Code here that will execute on triggering of this EH
-    [] spawn canyonRun_fnc_endFlight;
+    canyonRun_var_activeRun = false;
     // Should probably clean the EH up here immediately
     _unit removeEventHandler [_thisEvent, _thisEventHandler];
 }];
@@ -68,7 +79,8 @@ _pilot addEventHandler ["Killed", {
 _pilot addEventHandler ["GetOutMan", {
 	params ["_unit", "_role", "_vehicle", "_turret"];
     // Code here that will execute on triggering of this EH
-    [] spawn canyonRun_fnc_endFlight;
+    canyonRun_var_activeRun = false;
+    _unit setDamage 2;
     // Should probably clean the EH up here immediately
     _unit removeEventHandler [_thisEvent, _thisEventHandler];
 }];
@@ -76,7 +88,7 @@ _pilot addEventHandler ["GetOutMan", {
 // When a pilot achieves the win condition
 canyonRun_fnc_winCondition = {
     // Some code for checking for that or we'll make the goal execute the event
-    [] spawn canyonRun_fnc_endFlight;
+    canyonRun_var_activeRun = false;
 };
 
 
@@ -84,3 +96,28 @@ canyonRun_fnc_winCondition = {
 // ---------------------------------------- Active run state ----------------------------------------
 // Now we are airborne and all tracking is set up
 // This is the part where we do all the flying and points counting
+
+
+
+
+
+
+
+// --------------------------------- Check for the end of the run ----------------------------------
+
+[] spawn {
+
+    while {canyonRun_var_activeRun} do {
+
+        // Check things
+        sleep 1;
+
+    };
+};
+
+
+waitUntil {!canyonRun_var_activeRun};
+
+
+
+// ------------------------------------- Hand off to main loop--------------------------------------

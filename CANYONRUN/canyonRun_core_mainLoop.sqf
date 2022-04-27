@@ -12,10 +12,11 @@ waitUntil {canyonRun_var_scenarioLive};
 
 // --------------------------------- START OF MAIN LOOP ---------------------------------------
 
-while {canyonRun_var_scenarioLive} do {
+while {true} do { // for now no need to be able to stop this loop, people will have to disconnect.
+	
+	canyonRun_var_activeRun = false;
 
-
-	// Show a countdown on each machine
+	// Show a countdown on each machine before the next run initiates
 	[0,{
 		// First we need a countdown timer between runs
 		// Let's display it as a hint for now,
@@ -28,7 +29,7 @@ while {canyonRun_var_scenarioLive} do {
 		};
 		hintSilent ""; // Clear the hint
 
-		// Let the client know there is now a canyon run going
+		// Only the server needs this, but for now it's set on all clients right after the counter is done
 		canyonRun_var_activeRun = true;
 	}] call canyonRun_core_clientCode;
 
@@ -40,7 +41,9 @@ while {canyonRun_var_scenarioLive} do {
 	
 	canyonRun_var_currentPilot = _pilot; // Store for easy access during the run
 		
-	[] spawn canyonRun_fnc_startFlight;
+	[_pilot] call canyonRun_fnc_startFlight;
+
+
 
 
 
