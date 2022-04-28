@@ -90,8 +90,8 @@ Functionality for release should be:
 // ----------------------------------CURRENTLY AT:--------------------------------------
 /* 
 
-Currently the game loop is functioning in MP singleplayer
-Next is to make the points counting and fuel leak work
+Now we either do the points thing and make sure that is working,
+or we start work on the camera to make sure every run can be observed.
 
 */
 // ----------------------------------CURRENTLY AT:--------------------------------------
@@ -116,21 +116,32 @@ canyonRun_var_activeRun = false; // Used to indicate wether there is an active r
 canyonRun_fnc_compileAll = {
 
 	canyonRun_core_mainLoop = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_mainLoop.sqf";
+	publicVariable "canyonRun_core_mainLoop";
 	canyonRun_fnc_playerManagement = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerManagement.sqf";
+	publicVariable "canyonRun_fnc_playerManagement";
 	canyonRun_fnc_playerQueue = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerQueue.sqf";
+	publicVariable "canyonRun_fnc_playerQueue";
 	canyonRun_fnc_debug = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_debug.sqf";
+	publicVariable "canyonRun_fnc_debug";
 	canyonRun_fnc_planeList = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_planeList.sqf";
+	publicVariable "canyonRun_fnc_planeList";
 	canyonRun_fnc_fuelLeak = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_fuelLeak.sqf";
-	canyonRun_fnc_startFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_startFlight.sqf";
+	publicVariable "canyonRun_fnc_fuelLeak";
+	canyonrun_fnc_runFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonrun_fnc_runFlight.sqf";
+	publicVariable "canyonrun_fnc_runFlight";
 	canyonRun_fnc_endFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_endFlight.sqf";
+	publicVariable "canyonRun_fnc_endFlight";
 	canyonRun_fnc_enemies = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_enemies.sqf";
+	publicVariable "canyonRun_fnc_enemies";
 	canyonRun_fnc_observerScreen = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_observerScreen.sqf";
+	publicVariable "canyonRun_fnc_observerScreen";
 	canyonRun_fnc_score = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_score.sqf";
+	publicVariable "canyonRun_fnc_score";
 	canyonRun_core_clientCode = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_clientCode.sqf";
+	publicVariable "canyonRun_core_clientCode";
 	fnc_test = compile preprocessFileLineNumbers "CANYONRUN\fnc_test.sqf";
-
-
-
+	publicVariable "fnc_test";
+	
 	if (canyonRun_var_debug) then {
 		["scripts compiled"] call canyonRun_fnc_debug;
 	};
@@ -255,7 +266,7 @@ if (hasInterface) then {	// run on all player clients incl. player host
 	// Set the scenario loose by setting the varible to true and broadcasting it to all clients
 	canyonRun_var_spawnFlag addAction ["start scenario",{
 		missionNamespace setVariable ["canyonRun_var_scenarioLive", true, true];
-		["Senario is LIVE"] remoteExec ["systemchat",0];
+		["Scenario is LIVE"] remoteExec ["systemchat",0];
 		removeAllActions canyonRun_var_spawnFlag;
 	}];
 

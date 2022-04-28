@@ -37,12 +37,46 @@ while {true} do { // for now no need to be able to stop this loop, people will h
 
 	// Now that we counted down, it's time to start the run
 	_pilotUID   = (canyonRun_var_playerList select 0) select 0; // UID of the pilot
-	_pilot = _pilotUID call BIS_fnc_getUnitByUID;	
+	_pilot = _pilotUID call BIS_fnc_getUnitByUID;
+	_pilotClientID = owner _pilot;	// ClientID converted from UID
 	
 	canyonRun_var_currentPilot = _pilot; // Store for easy access during the run
 		
-	[_pilot] call canyonRun_fnc_startFlight;
+		
 
+
+	// Get the current pilot data at the beginning of the run
+	_pilotUID   = (canyonRun_var_playerList select 0) select 0; // UID of the pilot
+	_name       = (canyonRun_var_playerList select 0) select 1;
+	_aircraft   = (canyonRun_var_playerList select 0) select 2;
+	_points     = (canyonRun_var_playerList select 0) select 3;
+	_hiScore    = (canyonRun_var_playerList select 0) select 4;
+
+	
+
+	// Now we are actually ready to reorder the player list so that we get the next dude in line correctly
+	// In case someone wants to manipulate the order during someone else's run
+	[_pilotUID,"last"] call canyonRun_fnc_playerQueue; // Move player of this UID to last in queue
+
+
+
+
+
+	// This might mean timing issues but we'll leave that to tomorrow me
+	_pilotClientID publicVariableClient "canyonrun_fnc_runFlight";
+	[_pilotUID] remoteExec ["canyonrun_fnc_runFlight",_pilotClientID];
+	
+
+	// Wait for the flying client to end their run or disconnect
+	[] spawn {
+		while {canyonRun_var_activeRun} do {
+			// Check things
+			sleep 1;
+		};
+	};
+	waitUntil {!canyonRun_var_activeRun};
+
+	// Now that the flight is done, do stuff
 
 
 
