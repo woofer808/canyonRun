@@ -16,10 +16,6 @@ aa fireAtTarget [helo]
 
 
 
-
-
-
-
 _groupLeaders = allUnits select {side _x == west};
 systemchat str _groupLeaders;
 

@@ -40,7 +40,6 @@ if (_input == "first") then {
 	}; // end of case
 
 	if (_input == "last") then {
-		systemchat "moving to last...";
 		private _index = [canyonRun_var_playerList, _playerUID] call BIS_fnc_findNestedElement;
 		_index = _index select 0;
 		private _player = canyonRun_var_playerList select _index;

@@ -33,15 +33,38 @@ private _pilot = _pilotUID call BIS_fnc_getUnitByUID;
 
 private _endRun = false;
 
-private _aircraft   = (canyonRun_var_playerList select 0) select 2;
+canyonRun_var_runScore = 0;
+
+
+
+// Looks like the function in the trigger is executed on every machine as the plane goes through
+/*
+https://community.bistudio.com/wiki/6thSense.eu/EG#Locality
+Triggers created in editor exist on all machines (a trigger is created per machine, local to it),
+and they run on all machines (conditions checked, onActivation/onDeActivation
+executed when condition is true etc)
+
+So it would seem that I need to make sure point get is either only run on the pilot's client
+or only on the server
+
+*/
+canyonRun_fnc_pointGate = {
+	canyonRun_var_runScore = canyonRun_var_runScore + 1;
+    hint format ["the point! now %1 point!",canyonRun_var_runScore];
+};
+
+
+
+private _aircraftType = (canyonRun_var_playerList select 0) select 2;
+
+// If the current pilot is fully watching through the observation screen, turn that shit off.
+canyonrun_var_camera cameraEffect ["internal", "BACK","stream"];
 
 // ------------------------------------- Put pilot in plane -------------------------------------
 
 
-
 // Spawn aircraft at the starting location and make it fly
-_aircraftObject = createVehicle [_aircraft, getPos startLocation, [], 0, "FLY"];
-canyonRun_aircraft = _aircraftObject;
+_aircraftObject = createVehicle [_aircraftType, getPos startLocation, [], 0, "FLY"];
 
 // Set the vehicle pointing the correct starting direction.
 [_aircraftObject, 60] call KK_fnc_setDirFLY;
@@ -93,19 +116,45 @@ canyonRun_fnc_winCondition = {
 
 
 
-// ---------------------------------------- Active run state ----------------------------------------
-// Now we are airborne and all tracking is set up
-// This is the part where we do all the flying and points counting
+
+// ---------------------------------------- Active run ----------------------------------------
+
+// Out of bounds detection
+// I should put in a warning mechanic that gives you a few seconds to get back into safe air
+canyonRun_fnc_outOfBounds = {
+    params ["_unit"];
+	//_unit setdamage 10;
+	systemChat "out of bounds";
+};
+
+// Check for altitude
+// I should put in a warning mechanic that gives you a few seconds to get back into safe air
+[_pilot] spawn {
+    params ["_unit"];
+
+    while {canyonRun_var_activeRun} do {
+        _altitude = ((getPosATL _unit) select 2);		// Get the current altitude above ground
+        
+        if ( _altitude > 200 ) exitWith {
+            //_unit setDamage 10;						// When you're too high, you die for now
+            systemChat "too high!";
+        };
+    };
+};
 
 
+// Get the fuel leak going
+[_aircraftObject] spawn canyonRun_fnc_fuelLeak;
 
 
-
-
-
-
+// ---------------------------------------- End of run ----------------------------------------
 
 waitUntil {!canyonRun_var_activeRun};
+
+// Pass the score of this pilot to the server for updating of the player list ON the server
+[_pilotUID,canyonRun_var_runScore] remoteExec ["canyonRun_fnc_updateScore",2];
+
+
 
 
 

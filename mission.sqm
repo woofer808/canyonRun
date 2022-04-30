@@ -8,7 +8,7 @@ class EditorData
 	toggles=1;
 	class ItemIDProvider
 	{
-		nextID=1012;
+		nextID=1021;
 	};
 	class MarkerIDProvider
 	{
@@ -16,10 +16,10 @@ class EditorData
 	};
 	class Camera
 	{
-		pos[]={3896.2664,412.72577,1079.1577};
-		dir[]={-0.6156128,-0.57335079,0.54063833};
-		up[]={-0.43080404,0.81931001,0.37833714};
-		aside[]={0.65987027,-1.4901161e-008,0.75137955};
+		pos[]={3879.6213,429.39331,1047.6051};
+		dir[]={0.083933122,-0.49235594,0.8663547};
+		up[]={0.047477312,0.87038791,0.49006942};
+		aside[]={0.99535531,-4.6743662e-007,-0.096430004};
 	};
 };
 binarizationWanted=0;
@@ -270,7 +270,7 @@ class Mission
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=2000;
 				sizeB=100;
 				activationBy="WEST";
@@ -283,12 +283,12 @@ class Mission
 		class Item1
 		{
 			dataType="Trigger";
-			position[]={5859.5615,403.76144,4420.4194};
-			angle=5.7114058;
+			position[]={5859.562,403.76151,4420.4189};
+			angle=5.7113967;
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=2000;
 				sizeB=100;
 				activationBy="WEST";
@@ -305,7 +305,7 @@ class Mission
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=2000;
 				sizeB=100;
 				activationBy="WEST";
@@ -333,12 +333,12 @@ class Mission
 		class Item4
 		{
 			dataType="Trigger";
-			position[]={-420.20227,498.03845,-315.15198};
-			angle=2.2698045;
+			position[]={-420.202,498.03839,-315.15201};
+			angle=2.2697999;
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=2000;
 				sizeB=100;
 				activationBy="WEST";
@@ -346,6 +346,7 @@ class Mission
 			};
 			id=21;
 			type="EmptyDetector";
+			atlOffset=-3.0517578e-005;
 		};
 		class Item5
 		{
@@ -355,7 +356,7 @@ class Mission
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=2000;
 				sizeB=100;
 				activationBy="WEST";
@@ -1618,7 +1619,7 @@ class Mission
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=2000;
 				sizeB=100;
 				activationBy="WEST";
@@ -1636,7 +1637,7 @@ class Mission
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=1000;
 				sizeB=100;
 				activationBy="WEST";
@@ -1648,12 +1649,12 @@ class Mission
 		class Item136
 		{
 			dataType="Trigger";
-			position[]={-723.1015,325.69568,2357.9197};
-			angle=0.99015546;
+			position[]={-723.10199,325.69559,2357.9199};
+			angle=0.99015856;
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=800;
 				sizeB=100;
 				activationBy="WEST";
@@ -1665,12 +1666,12 @@ class Mission
 		class Item137
 		{
 			dataType="Trigger";
-			position[]={-2045.2719,365.944,1073.8888};
-			angle=2.8203132;
+			position[]={-2045.272,365.944,1073.889};
+			angle=2.8203111;
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=2000;
 				sizeB=100;
 				activationBy="WEST";
@@ -1678,16 +1679,17 @@ class Mission
 			};
 			id=337;
 			type="EmptyDetector";
+			atlOffset=3.0517578e-005;
 		};
 		class Item138
 		{
 			dataType="Trigger";
-			position[]={-2569.6973,414.12039,-694.94934};
-			angle=0.83442777;
+			position[]={-2569.697,414.12039,-694.94897};
+			angle=0.83442438;
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=2000;
 				sizeB=100;
 				activationBy="WEST";
@@ -1695,6 +1697,7 @@ class Mission
 			};
 			id=338;
 			type="EmptyDetector";
+			atlOffset=-3.0517578e-005;
 		};
 		class Item139
 		{
@@ -1704,7 +1707,7 @@ class Mission
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=700;
 				sizeB=100;
 				activationBy="WEST";
@@ -1721,7 +1724,7 @@ class Mission
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=700;
 				sizeB=100;
 				activationBy="WEST";
@@ -1738,7 +1741,7 @@ class Mission
 			class Attributes
 			{
 				condition="call{this}";
-				onActivation="call{[] call canyonrun_fnc_outOfBounds}";
+				onActivation="call{[player] call canyonrun_fnc_outOfBounds}";
 				sizeA=700;
 				sizeB=100;
 				activationBy="WEST";

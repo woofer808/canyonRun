@@ -42,56 +42,67 @@ Editor skilled game masters can change up the route or enemy configuration betwe
 ----------------------------------- ROADMAP --------------------------------------------
 Functionality for alpha should be:
 x locality written for MP from the ground up, the server is boss
-- load into the scenario without issue
+x load into the scenario without issue
 x pilot order is set as in lobby and possible JIP
-- option to start mission at the beginning on the flag
-- one minute between automated runs, no manual starts at will
-- only one aircraft that is tuned which means no selection
-- enemies on ground during each run
-- score tracking
-- hiscore tracking
+x option to start mission at the beginning on the flag
+x one minute between automated runs, no manual starts at will
+x only one aircraft that is tuned which means no selection
+x fresh editor placed enemies on ground during each run
+x score tracking
+x hiscore tracking
 x camera feed at camp
+x Out of bounds mechanic
+x Fuel depletion mechanic
 
 Functionality for beta should be:
+- Live monitoring of aircraft fuel level for all players
 - game master
 - GUI for game master
 - several aircraft
 - GUI for players selection of aircraft
 - GUI for changing player queue order by game master
+- Cleanup old wrecks
 - instructions in diary
 - markers/explanations on map
 - instructions in camp
 - scoreboard
 - win condition or max score condition
-- suggestions
 - map tracking
+- CBA option for exiting observation screen
+- Sound effect for engine failure
+- suggestions
 
 Functionality for release should be:
 - as many aircraft configured as possible
+- Cleanup of code and commenting with proper headers
+- Optimize file sizes
 - suggestions
 
 -------------------------------------------------------------------------------------- */
 
-//TODO- Add highscore
-//TODO- Currently the scripts are compiled on all clients
-//TODO- Make the server update all the clients so that they see each new run through the observer screen
-//TODO- Game master needs to retain the option of starting the interface between deaths
-//TODO- Build system that keeps track of current game state
-//TODO- Camera should always run, but be aimed at the current aircraft
+//TODO- Update clientCode to work in SP conditions sith SP_PLAYER UID
+//IDEA- Mark player crashes on the map in some good way - maybe the latest only?
 //IDEA- Make camera use different spots for each section of the circuit
 //IDEA- TFAR pre-configured channels for aircraft and radios on pilots
-//TODO- CBA option for exiting camera
-//TODO- Mark player crashes on the map
-//TODO- Make sure pilots can't either bail or that they lose their run if they do
-//TODO- Player that starts a flight need to have their observation camera shut down if they are in it
 
 
 // ----------------------------------CURRENTLY AT:--------------------------------------
 // ----------------------------------CURRENTLY AT:--------------------------------------
 /* 
 
-Now we either do the points thing and make sure that is working,
-or we start work on the camera to make sure every run can be observed.
+Place a few more enemies in the editor before going full Alpha.
+Fix the points system error described below before going full Alpha.
+
+camera stream: Timing issues making it so that the server player do not get a
+follow cam on other clients. Targeting works, but not the attaching of the camera.
+Sounds a bit like the aircraftobject isn't really live across the network when the
+camera attempts to move and attach itself to it.
+
+
+when p2 flies, p1 still get points in hint but not in array
+other players do not get systemchat info on why the player lost
+camera needs a deathcam or at least a few seconds before going back to spawn
+attached followcam looks real jank in observer screen stream
 
 */
 // ----------------------------------CURRENTLY AT:--------------------------------------
@@ -104,11 +115,9 @@ or we start work on the camera to make sure every run can be observed.
 // Debug and development mode switches
 canyonRun_var_debug = true;
 canyonRun_var_devMode = true;
-canyonRun_var_pilot = 0;
-canyonRun_var_aircraft = 0;
+canyonRun_var_aircraft = "I_Plane_fighter_04_F";
 canyonRun_var_pilot = player;
 canyonRun_var_scenarioLive = false;	// variable to start the scenario
-canyonRun_var_goFlight = false; // Used for starting a run
 canyonRun_var_activeRun = false; // Used to indicate wether there is an active run currently going on
 
 
@@ -129,16 +138,14 @@ canyonRun_fnc_compileAll = {
 	publicVariable "canyonRun_fnc_fuelLeak";
 	canyonrun_fnc_runFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonrun_fnc_runFlight.sqf";
 	publicVariable "canyonrun_fnc_runFlight";
-	canyonRun_fnc_endFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_endFlight.sqf";
-	publicVariable "canyonRun_fnc_endFlight";
 	canyonRun_fnc_enemies = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_enemies.sqf";
 	publicVariable "canyonRun_fnc_enemies";
 	canyonRun_fnc_observerScreen = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_observerScreen.sqf";
 	publicVariable "canyonRun_fnc_observerScreen";
-	canyonRun_fnc_score = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_score.sqf";
-	publicVariable "canyonRun_fnc_score";
-	canyonRun_core_clientCode = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_clientCode.sqf";
-	publicVariable "canyonRun_core_clientCode";
+	canyonRun_fnc_updateScore = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_updateScore.sqf";
+	publicVariable "canyonRun_fnc_updateScore";
+	canyonRun_fnc_clientCode = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_clientCode.sqf";
+	publicVariable "canyonRun_fnc_clientCode";
 	fnc_test = compile preprocessFileLineNumbers "CANYONRUN\fnc_test.sqf";
 	publicVariable "fnc_test";
 	
@@ -149,8 +156,6 @@ canyonRun_fnc_compileAll = {
 };
 [] call canyonRun_fnc_compileAll;
 
-// Global variables initialization on all clients and server
-canyonRun_var_missionGo = false;		// Used to initialize mission on all clients to let server do the startup
 
 
 if (isServer) then {	// run on dedicated server or player host
@@ -194,9 +199,6 @@ if (isServer) then {	// run on dedicated server or player host
 	// Make sure all the clients and JIP get the array for use in their selection
 	publicVariable "canyonRun_var_aircraftList";
 
-	// Set the variable for mission go to let each client start loading code
-	missionNamespace setVariable ["canyonRun_var_missionGo", true, true];
-
 	
 	// Initialize enemies only run by the server
 	[] call canyonRun_fnc_enemies;
@@ -217,10 +219,10 @@ if (isServer) then {	// run on dedicated server or player host
 };	// End of server-side only executed code
 
 
+
 if (hasInterface) then {	// run on all player clients incl. player host
 
-	waitUntil {canyonRun_var_missionGo};
-
+	
 	// Let each player execute the GUI
 	[] execVM "CANYONRUN\canyonRun_gui\canyonRun_gui_init.sqf";
 
@@ -272,13 +274,5 @@ if (hasInterface) then {	// run on all player clients incl. player host
 
 
 };	// End of hasInterface executed code
-
-
-
-// This has to be moved to some sort of game mechanic sqf
-canyonRun_fnc_outOfBounds = {
-	canyonRun_pilot setdamage 10;
-	systemChat "out of bounds";
-};
 
 

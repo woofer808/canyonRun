@@ -1,2 +1,11 @@
 #include "CANYONRUN\canyonRun_gui\canyonRun_gui_definitions.hpp"
 #include "CANYONRUN\canyonRun_gui\canyonRun_gui_dialogs.hpp"
+
+author = "woofer"; // Author
+onLoadName = "canyon run"; // Mission name (temporary solution; actual name set in editor will be used later in the alpha)
+onLoadMission = "Make it as far as possible into the canyon with your broken fuel pump."; // Description
+loadScreen = "CANYONRUN\img\splashScreenAlpha.jpg"; // Preview picture
+class Header
+{
+	gameType = Coop; // MP mission type
+};

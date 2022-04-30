@@ -23,7 +23,7 @@ publicVariable "canyonRun_fnc_clientFunction";
 sleep 1;
 remoteExec ["canyonrun_fnc_compileall",_target]; 
 sleep 1;
-[_target,_code] call canyonRun_core_clientCode;
+[_target,_code] call canyonRun_fnc_clientCode;
 
 ------------------------------------------------------------------------------------ */
 
