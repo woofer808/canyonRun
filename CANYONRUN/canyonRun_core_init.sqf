@@ -1,3 +1,4 @@
+
 /*
 *										Canyon Run, by woofer.
 *
@@ -7,15 +8,14 @@
 *	run a low-altitude gauntlet of anti-air units with limited fuel.
 *
 *	Definitions:
-*	- Scene: A predefined camera angle with camera movement along with take time, fov and so on.
 *	- Variable names: canyonRun_var_variableName
 *	- Function and script names: canyonRun_fnc_functionOrScriptName(.sqf)
 *	- Object names: canyonRun_objectName
 *
-*	Game loop:
+*	Game idea:
 *	You have a broken fuel pump. The more gas you give, the more fuel gets dumped overboard.
 *	To make things worse, you are in hostile territory where enemies are testing their Anti-air laser systems.
-
+*
 *	- Don't raise above 200m above ground or you'll get insta-lazored.
 *	- Don't go into the testing zones outside of the canyon or get burninated.
 *	- Don't give too much throttle, or you'll loose your fuel before getting out.
@@ -29,11 +29,11 @@
 
 /* ------------------------------ PROJECT PLAN ----------------------------------------
 The game loop:
-Fly through the terrain while loosing fuel as far through the maze as possible,
+Fly through the terrain while loosing fuel as far through the maze as possible
 without crashing, going out of bounds or being shot down.
 
 What makes it fun:
-Made to play as a party game where you get to watch each friend's run together through
+Made to play as a party game where everybody get to watch each friend's run together through
 an in-game provided follow camera.
 
 What makes it last:
@@ -41,76 +41,113 @@ Editor skilled game masters can change up the route or enemy configuration betwe
 
 ----------------------------------- ROADMAP --------------------------------------------
 Functionality for alpha should be:
-- locality written for MP from the ground up, the server is boss
-- load into the scenario without issue
-- pilot order is set as in lobby and possible JIP
-- option to start mission at the beginning
-- one minute between automated runs, no manual starts at will
-- only one aircraft that is tuned which means no selection
-- enemies on ground during each run
-- score tracking
-- camera feed at camp
+x locality written for MP from the ground up, the server is boss
+x load into the scenario without issue
+x pilot order is set as in lobby and possible JIP
+x option to start mission at the beginning on the flag
+x one minute between automated runs, no manual starts at will
+x only one aircraft that is tuned which means no selection
+x fresh editor placed enemies on ground during each run
+x score tracking
+x hiscore tracking
+x camera feed at camp
+x Out of bounds mechanic
+x Fuel depletion mechanic
 
 Functionality for beta should be:
+- JIP verification
+- Live monitoring of aircraft fuel level for all players
 - game master
 - GUI for game master
 - several aircraft
 - GUI for players selection of aircraft
+- GUI for changing player queue order by game master
+- Cleanup old wrecks
 - instructions in diary
 - markers/explanations on map
 - instructions in camp
 - scoreboard
 - win condition or max score condition
+- map tracking
+- CBA option for exiting observation screen
+- Sound effect for engine failure
 - suggestions
+- kill messages (by enemy or crash)
 
 Functionality for release should be:
 - as many aircraft configured as possible
+- Cleanup of code and commenting with proper headers
+- Optimize file sizes
+- Enviroment controls (daytime/nighttime and weather)
 - suggestions
 
 -------------------------------------------------------------------------------------- */
 
-//REDO- Do we want a game master or should there be a timed automated pass-around of controls. Need a way to minimize griefing
-//REDO- Make it so that every round start and stop is done by the server
-//REDO- Every regular non-playing player can only update their preferred aircraft for now
-//REDO- Need a way to pass game master around
-
-//TODO- Make the server update all the clients so that they see each new run through the observer screen
-//TODO- Game master needs to retain the option of starting the interface between deaths
-//TODO- Build system that keeps track of current game state
-//TODO- Camera should always run, but be aimed at the current aircraft
+//TODO- High score message for clients is shown on server
+//TODO- Update clientCode to work in SP conditions sith SP_PLAYER UID
+//IDEA- Mark player crashes on the map in some good way - maybe the latest only?
 //IDEA- Make camera use different spots for each section of the circuit
 //IDEA- TFAR pre-configured channels for aircraft and radios on pilots
+//KNOWN- If player is in camera when run starts, the spawned F1 keypress is left alive.
+//KNOWN- Intel on table has a default action of "take intel" - use for fun?
+
+
+// ----------------------------------CURRENTLY AT:--------------------------------------
+// ----------------------------------CURRENTLY AT:--------------------------------------
+/* 
+
+
+*/
+// ----------------------------------CURRENTLY AT:--------------------------------------
+// ----------------------------------CURRENTLY AT:--------------------------------------
+
+
+
 
 
 // Debug and development mode switches
-canyonRun_var_debug = true;
-canyonRun_var_devMode = true;
-canyonRun_var_pilot = 0;
-canyonRun_var_aircraft = 0;
+canyonRun_var_debug = false;
+canyonRun_var_devMode = false;
+canyonRun_var_aircraft = "I_Plane_fighter_04_F";
 canyonRun_var_pilot = player;
+canyonRun_var_scenarioLive = false;	// variable to start the scenario
+canyonRun_var_activeRun = false; // Used to indicate wether there is an active run currently going on
 
 
-
-
-
-// Functions to be compiled
+// Functions to be compiled, currently done on all clients but might be wise to move to server
 canyonRun_fnc_compileAll = {
 
+	canyonRun_core_mainLoop = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_mainLoop.sqf";
+	publicVariable "canyonRun_core_mainLoop";
 	canyonRun_fnc_playerManagement = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerManagement.sqf";
+	publicVariable "canyonRun_fnc_playerManagement";
+	canyonRun_fnc_playerQueue = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerQueue.sqf";
+	publicVariable "canyonRun_fnc_playerQueue";
 	canyonRun_fnc_debug = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_debug.sqf";
+	publicVariable "canyonRun_fnc_debug";
 	canyonRun_fnc_planeList = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_planeList.sqf";
+	publicVariable "canyonRun_fnc_planeList";
 	canyonRun_fnc_fuelLeak = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_fuelLeak.sqf";
-	canyonRun_fnc_startFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_startFlight.sqf";
-	canyonRun_fnc_endFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_endFlight.sqf";
+	publicVariable "canyonRun_fnc_fuelLeak";
+	canyonrun_fnc_runFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonrun_fnc_runFlight.sqf";
+	publicVariable "canyonrun_fnc_runFlight";
 	canyonRun_fnc_enemies = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_enemies.sqf";
+	publicVariable "canyonRun_fnc_enemies";
 	canyonRun_fnc_observerScreen = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_observerScreen.sqf";
-	canyonRun_fnc_score = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_score.sqf";
+	publicVariable "canyonRun_fnc_observerScreen";
+	canyonRun_fnc_updateScore = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_updateScore.sqf";
+	publicVariable "canyonRun_fnc_updateScore";
+	canyonRun_fnc_clientCode = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_clientCode.sqf";
+	publicVariable "canyonRun_fnc_clientCode";
+	fnc_test = compile preprocessFileLineNumbers "CANYONRUN\fnc_test.sqf";
+	publicVariable "fnc_test";
+	
+	if (canyonRun_var_debug) then {
+		["scripts compiled"] call canyonRun_fnc_debug;
+	};
 
 };
 [] call canyonRun_fnc_compileAll;
-
-// Global variables initialization on all clients and server
-canyonRun_var_missionGo = false;		// Used to initialize mission on all clients to let server do the startup
 
 
 
@@ -118,7 +155,7 @@ if (isServer) then {	// run on dedicated server or player host
 	
 	[] call canyonRun_fnc_playerManagement; // This will take proper action when people join or leave the session
 
-	/*	
+	/*
 	*
 	*	The server will generate a list of available aircraft and broadcast that to all the clients.
 	*
@@ -155,9 +192,6 @@ if (isServer) then {	// run on dedicated server or player host
 	// Make sure all the clients and JIP get the array for use in their selection
 	publicVariable "canyonRun_var_aircraftList";
 
-	// Set the variable for mission go to let each client start loading code
-	missionNamespace setVariable ["canyonRun_var_missionGo", true, true];
-
 	
 	// Initialize enemies only run by the server
 	[] call canyonRun_fnc_enemies;
@@ -172,36 +206,20 @@ if (isServer) then {	// run on dedicated server or player host
 		{deleteVehicle _x} forEach ([p0,p1,p2,p3,p4,p5,p6,p7,p8,p9] - [player]);
 	}; // End of single player specific code
 
-
-
+	// This is where the gameplay loop should kick off
+	[] spawn canyonRun_core_mainLoop;
 
 };	// End of server-side only executed code
 
 
 
-
-
 if (hasInterface) then {	// run on all player clients incl. player host
 
-	waitUntil {canyonRun_var_missionGo};
-
+	
 	// Let each player execute the GUI
 	[] execVM "CANYONRUN\canyonRun_gui\canyonRun_gui_init.sqf";
 
 	
-	// This is a debug counter for current number of units on the terrain thay only runs on mission start
-	[] spawn {
-		if canyonRun_var_debug then {
-			while {canyonRun_var_debug == true} do {
-			_blueUnits 	= count (allUnits select {side _x == west});
-			_redUnits 	= count (allUnits select {side _x == east});
-			hintSilent format ["Unit count west: %1, east: %2", _blueUnits, _redUnits]};
-			sleep 1;
-		};
-	};
-
-
-
 
 
 	// ---------------------------------------------------------------------
@@ -213,7 +231,7 @@ if (hasInterface) then {	// run on all player clients incl. player host
 	// Set the screen texture to the image stream from the camera
 	canyonRun_var_screen setObjectTexture [0, "#(argb,512,512,1)r2t(stream,1)"];
 
-	/* create camera and stream to render surface */
+	// create camera and stream to render surface
 	canyonRun_var_camera = "camera" camCreate (canyonRun_var_spawnFlag modelToWorld [20,15,10]);
 	canyonRun_var_camera cameraEffect ["Internal", "Back", "stream"];
 	"stream" setPiPEffect [0];			// Set the proper camera effect
@@ -239,21 +257,15 @@ if (hasInterface) then {	// run on all player clients incl. player host
 
 
 
-
-
-// TEMPORARY: Should probably only be executed by the game master even though each player need to be able to choose aircraft
-// Give the spawn flag option to start the run
-canyonRun_var_spawnFlag addAction ["run",{_handle=createdialog "canyonRun_gui_dialogMain"}];
-
-
+	// TEMPORARY: Should probably only be executed by the game master even though each player need to be able to choose aircraft
+	// Set the scenario loose by setting the varible to true and broadcasting it to all clients
+	canyonRun_var_spawnFlag addAction ["start scenario",{
+		missionNamespace setVariable ["canyonRun_var_scenarioLive", true, true];
+		["Scenario is LIVE"] remoteExec ["systemchat",0];
+		removeAllActions canyonRun_var_spawnFlag;
+	}];
 
 
 };	// End of hasInterface executed code
 
 
-
-// This has to be moved to some sort of game mechanic sqf
-canyonRun_fnc_outOfBounds = {
-	canyonRun_pilot setdamage 10;
-	systemChat "out of bounds";
-};

@@ -1,14 +1,14 @@
 /*
 *	This function is responsible for maintaining the player queue
 *
-*	[_uid,true,false] call canyonRun_fnc_playerQeue; // Move player of this UID to first in queue
-*	[_uid,false,true] call canyonRun_fnc_playerQeue; // Move player of this UID to last in queue
+*	[_uid,true,false] call canyonRun_fnc_playerQuSeue; // Move player of this UID to first in queue
+*	[_uid,false,true] call canyonRun_fnc_playerQueue; // Move player of this UID to last in queue
 *
 */
 
+
 private _playerUID		= _this select 0;	// player UID
-private _moveToLast		= _this select 1;	// BOOL
-private _moveToFirst 	= _this select 2;	// BOOL
+private _input 			= _this select 1;	// BOOL
 
 // The main usage of this function will be to take the first player in the list and move to the last position
 // That will happen when a run is completed of failed
@@ -17,16 +17,7 @@ private _moveToFirst 	= _this select 2;	// BOOL
 // The format of the list is: [_uid,_name,_selectedAircraft,_score]
 
 // So first we find the player to reposition by finding their UID in the array
-switch true do {
-	case (_moveToLast): {
-		private _index = [canyonRun_var_playerList, _playerUID] call BIS_fnc_findNestedElement;
-		private _player = canyonRun_var_playerList select (_index select 0);
-		canyonRun_var_playerList deleteAt canyonRun_var_playerList select (_index select 0);
-		canyonRun_var_playerList pushBack _player;
-
-	}; // end of case
-
-	case (_moveToFirst): {
+if (_input == "first") then {
 		// Move to first position
 		// Find out which element we want
 		private _index = [canyonRun_var_playerList, _playerUID] call BIS_fnc_findNestedElement;
@@ -41,7 +32,21 @@ switch true do {
 			_array set [_i,_array select (_i - 1)];
 		};
 
+	
+
 		// Finally set the first element as the temp variable
 		_array set [0,_temp];
 
-}; // end of case
+	}; // end of case
+
+	if (_input == "last") then {
+		private _index = [canyonRun_var_playerList, _playerUID] call BIS_fnc_findNestedElement;
+		_index = _index select 0;
+		private _player = canyonRun_var_playerList select _index;
+		canyonRun_var_playerList deleteAt _index;
+		canyonRun_var_playerList pushBack _player;
+		
+	}; // end of case
+
+// Push the updated array to all clients
+publicVariable "canyonRun_var_playerList";

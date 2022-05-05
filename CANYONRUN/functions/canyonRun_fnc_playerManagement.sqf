@@ -18,15 +18,15 @@ if (!isServer) exitWith {
 missionNamespace setVariable ["canyonRun_var_playerList", [], true];
 
 
-
 // Populate the list for the first time but do not count headless clients
 private _onlyPlayers = call BIS_fnc_listPlayers;
 {
-	_uid = getPlayerUID _x;														// Player UID as string to pinpoint a player
-	_name = name _x;															// The name as a string
-	_selectedAircraft = "B_Plane_Fighter_01_F";									// This aircraft is assigned by default
-	_score = 0;																	// You will have to start with a score of zero
-	canyonRun_var_playerList pushBack [_uid,_name,_selectedAircraft,_score];	// Add to the list
+	_uid = getPlayerUID _x;																// Player UID as string to pinpoint a player
+	_name = name _x;																	// The name as a string
+	_selectedAircraft = "I_Plane_fighter_04_F";											// This aircraft is assigned by default
+	_score = 0;																			// Score of current/last run
+	_highScore = 0;																		// The highest score achieved during a run
+	canyonRun_var_playerList pushBack [_uid,_name,_selectedAircraft,_score,_highScore];	// Add to the list
 } forEach _onlyPlayers;
 
 
@@ -42,6 +42,8 @@ private _onlyPlayers = call BIS_fnc_listPlayers;
 
 
 /*
+This command will execute the provided code on the server whenever a player connects to a multiplayer session.
+
 id: Number - unique DirectPlay ID (very large number). It is also the same id used for user placed markers (same as _id param)
 uid: String - getPlayerUID of the joining client. The same as Steam ID (same as _uid param)
 name: String - profileName of the joining client (same as _name param)
@@ -53,7 +55,7 @@ addMissionEventHandler ["PlayerConnected",
 {
 	params ["_id", "_uid", "_name", "_jip", "_owner", "_idstr"]; // This comes from the eventhandler
 
-	_selectedAircraft = "B_Plane_Fighter_01_F";					// This aircraft is assigned by default
+	_selectedAircraft = "I_Plane_fighter_04_F";					// This aircraft is assigned by default
 	_score = 0;
 
 	
@@ -76,6 +78,8 @@ addMissionEventHandler ["PlayerConnected",
 
 
 /*
+This command will execute the provided code on the server whenever a player connects to a multiplayer session.
+
 id: Number - unique DirectPlay ID (very large number). It is also the same id used for user placed markers (same as _id param)
 uid: String - getPlayerUID of the leaving client. The same as Steam ID (same as _uid param)
 name: String - profileName of the leaving client (same as _name param)
