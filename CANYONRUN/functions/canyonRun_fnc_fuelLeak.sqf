@@ -56,7 +56,7 @@ while { sleep 1; true } do {								// Here beginneth the loop that shalt loose 
 	
 	_aircraftObject setFuel (_currentFuel);						// Drain the fuel
 
-	hintSilent format ["fuel:%1 coef:%2 loss:%3",_currentFuel,_throttleCoeff,_fuelLoss];
+	//hintSilent format ["fuel:%1 coef:%2 loss:%3",_currentFuel,_throttleCoeff,_fuelLoss];
 
 	// This isn't enough
 	// Should also take into account that the player may disconnect

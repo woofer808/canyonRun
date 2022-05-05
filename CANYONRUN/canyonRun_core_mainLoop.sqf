@@ -9,7 +9,6 @@ This is the main game loop and should only run on the server
 // Halt the loading of the scenario code until someone initializes it
 waitUntil {canyonRun_var_scenarioLive};
 
-
 // --------------------------------- START OF MAIN LOOP ---------------------------------------
 
 while {true} do { // for now no need to be able to stop this loop, people will have to disconnect.
@@ -28,8 +27,15 @@ while {true} do { // for now no need to be able to stop this loop, people will h
 		// Let's display it as a hint for now,
 		// but would look nicer as a message every ten seconds before counting down the last few seconds.
 		// This should be synced up between clients using mission time
+		
+		private _waitTime = 60;
+		if (canyonRun_var_devMode) then {
+			_waitTime = 6;
+		} else {
+			_waitTime = 30;
+		};
 
-		for "_i" from 10 to 0 step -1 do {
+		for "_i" from _waitTime to 1 step -1 do {
 			_pilotName = (canyonRun_var_playerList select 0) select 1;
 			hintSilent format ["Next pilot %1 to start in %2 seconds", _pilotName,_i];
 			sleep 1;

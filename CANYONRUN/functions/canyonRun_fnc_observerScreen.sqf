@@ -69,7 +69,6 @@ if (_mode == "runFlight") then {
 
 	["observerScreen mode: runFlight"] call canyonRun_fnc_debug;
 	detach canyonRun_var_camera;
-	systemchat format ["runFlight using pilot: %1",_pilot];
 	canyonRun_var_camera camSetTarget (vehicle _pilot);
 	canyonRun_var_camera camSetRelPos [0,-50, 5];
 	canyonRun_var_camera attachTo [vehicle _pilot,[0,-50, 5]];

@@ -44,13 +44,25 @@ Triggers created in editor exist on all machines (a trigger is created per machi
 and they run on all machines (conditions checked, onActivation/onDeActivation
 executed when condition is true etc)
 
-So it would seem that I need to make sure point get is either only run on the pilot's client
-or only on the server
+So it would seem that I need to make sure point get only happens on the required client
+even though it is being executed on all clients
+I honestly do not want to put complicated code into triggers since it needs to be easily edited
+
+Seems like the best way forward is to make the function check if the player who triggerd it
+is the same as the one _pilot currently flying
 
 */
+canyonRun_var_currentPilot = _pilot;
 canyonRun_fnc_pointGate = {
-	canyonRun_var_runScore = canyonRun_var_runScore + 1;
-    hint format ["the point! now %1 point!",canyonRun_var_runScore];
+    
+    params ["_unit"]; // This unit that gets passed here from the trigger with thisList looks weird and is (owner _unit==0)
+
+    // Make sure the point is going to this trigger pilot only
+    
+    if (player == canyonRun_var_currentPilot ) then {
+        canyonRun_var_runScore = canyonRun_var_runScore + 1;
+    };
+        systemchat format ["the point! now %1 point!",canyonRun_var_runScore];
 };
 
 
@@ -86,6 +98,17 @@ player addEventHandler ["Killed", {
     
     systemchat format ["%1 failed the run",name _unit];
 
+
+    _killedPos = position _unit;
+    _killedMarkerName= format ["%1 %2",name player,time];
+    _killedMarker = createMarker [_killedMarkerName, _killedPos];
+    _killedMarker setMarkerShape "ICON"; 
+    _killedMarker setMarkerType "hd_dot";
+    _killedMarker setMarkerSize [1,1];
+    _killedMarker setMarkerColor "ColorWEST";
+    _killedMarker setMarkerText str name _unit;
+
+
     // Should probably clean the EH up here immediately
     _unit removeEventHandler [_thisEvent, _thisEventHandler];
     
@@ -108,6 +131,9 @@ player addEventHandler ["GetOutMan", {
 
 
 
+
+
+
 // When a pilot achieves the win condition
 canyonRun_fnc_winCondition = {
     // Some code for checking for that or we'll make the goal execute the event
@@ -123,7 +149,7 @@ canyonRun_fnc_winCondition = {
 // I should put in a warning mechanic that gives you a few seconds to get back into safe air
 canyonRun_fnc_outOfBounds = {
     params ["_unit"];
-	//_unit setdamage 10;
+	_unit setdamage 10;
 	systemChat "out of bounds";
 };
 
@@ -136,7 +162,7 @@ canyonRun_fnc_outOfBounds = {
         _altitude = ((getPosATL _unit) select 2);		// Get the current altitude above ground
         
         if ( _altitude > 200 ) exitWith {
-            //_unit setDamage 10;						// When you're too high, you die for now
+            _unit setDamage 10;						// When you're too high, you die for now
             systemChat "too high!";
         };
     };
@@ -152,7 +178,7 @@ canyonRun_fnc_outOfBounds = {
 waitUntil {!canyonRun_var_activeRun};
 
 // Pass the score of this pilot to the server for updating of the player list ON the server
-[_pilotUID,canyonRun_var_runScore] remoteExec ["canyonRun_fnc_updateScore",2];
+[_pilotUID,canyonRun_var_runScore] remoteExec ["canyonRun_fnc_updateScore",owner _pilot];
 
 
 

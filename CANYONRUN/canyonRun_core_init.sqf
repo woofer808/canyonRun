@@ -55,6 +55,7 @@ x Out of bounds mechanic
 x Fuel depletion mechanic
 
 Functionality for beta should be:
+- JIP verification
 - Live monitoring of aircraft fuel level for all players
 - game master
 - GUI for game master
@@ -71,38 +72,30 @@ Functionality for beta should be:
 - CBA option for exiting observation screen
 - Sound effect for engine failure
 - suggestions
+- kill messages (by enemy or crash)
 
 Functionality for release should be:
 - as many aircraft configured as possible
 - Cleanup of code and commenting with proper headers
 - Optimize file sizes
+- Enviroment controls (daytime/nighttime and weather)
 - suggestions
 
 -------------------------------------------------------------------------------------- */
 
+//TODO- High score message for clients is shown on server
 //TODO- Update clientCode to work in SP conditions sith SP_PLAYER UID
 //IDEA- Mark player crashes on the map in some good way - maybe the latest only?
 //IDEA- Make camera use different spots for each section of the circuit
 //IDEA- TFAR pre-configured channels for aircraft and radios on pilots
+//KNOWN- If player is in camera when run starts, the spawned F1 keypress is left alive.
+//KNOWN- Intel on table has a default action of "take intel" - use for fun?
 
 
 // ----------------------------------CURRENTLY AT:--------------------------------------
 // ----------------------------------CURRENTLY AT:--------------------------------------
 /* 
 
-Place a few more enemies in the editor before going full Alpha.
-Fix the points system error described below before going full Alpha.
-
-camera stream: Timing issues making it so that the server player do not get a
-follow cam on other clients. Targeting works, but not the attaching of the camera.
-Sounds a bit like the aircraftobject isn't really live across the network when the
-camera attempts to move and attach itself to it.
-
-
-when p2 flies, p1 still get points in hint but not in array
-other players do not get systemchat info on why the player lost
-camera needs a deathcam or at least a few seconds before going back to spawn
-attached followcam looks real jank in observer screen stream
 
 */
 // ----------------------------------CURRENTLY AT:--------------------------------------
@@ -113,8 +106,8 @@ attached followcam looks real jank in observer screen stream
 
 
 // Debug and development mode switches
-canyonRun_var_debug = true;
-canyonRun_var_devMode = true;
+canyonRun_var_debug = false;
+canyonRun_var_devMode = false;
 canyonRun_var_aircraft = "I_Plane_fighter_04_F";
 canyonRun_var_pilot = player;
 canyonRun_var_scenarioLive = false;	// variable to start the scenario

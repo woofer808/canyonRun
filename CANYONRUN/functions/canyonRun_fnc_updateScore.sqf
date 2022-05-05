@@ -29,19 +29,6 @@
 // Maybe I should bring down the pilots array item and then send it back to the server when done
 // and then the server can update the array accordingly
 
-/*
-
-loop start > send on out > 
-
-start flight > _current score = 0 > > if _current greaterthan _high score update _high score
-
-
-
-
-
- */
-
-
 
 
 
