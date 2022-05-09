@@ -55,47 +55,62 @@ x Out of bounds mechanic
 x Fuel depletion mechanic
 
 Functionality for beta should be:
+- map tracking along with current fuel level and name (local on each client, I suppose)
+- GUI for players selection of aircraft
+- kill messages (killed by enemy or crash)
 - JIP verification
 - Live monitoring of aircraft fuel level for all players
 - game master
 - GUI for game master
 - several aircraft
-- GUI for players selection of aircraft
 - GUI for changing player queue order by game master
-- Cleanup old wrecks
-- instructions in diary
 - markers/explanations on map
-- instructions in camp
 - scoreboard
+x instructions in diary
+- instructions in camp
 - win condition or max score condition
-- map tracking
 - CBA option for exiting observation screen
-- Sound effect for engine failure
+x Sound effect for engine failure
+x visual cue for engine failure
 - suggestions
-- kill messages (by enemy or crash)
 
 Functionality for release should be:
 - as many aircraft configured as possible
 - Cleanup of code and commenting with proper headers
 - Optimize file sizes
 - Enviroment controls (daytime/nighttime and weather)
+- Update diary to final features
 - suggestions
 
 -------------------------------------------------------------------------------------- */
 
+//KNOWN- If player is in camera when run starts, the spawned F1 keypress is left alive.
+//KNOWN- Intel on table has a default action of "take intel" - use for easter egg/enemy pos?
 //TODO- High score message for clients is shown on server
 //TODO- Update clientCode to work in SP conditions sith SP_PLAYER UID
 //IDEA- Mark player crashes on the map in some good way - maybe the latest only?
 //IDEA- Make camera use different spots for each section of the circuit
 //IDEA- TFAR pre-configured channels for aircraft and radios on pilots
-//KNOWN- If player is in camera when run starts, the spawned F1 keypress is left alive.
-//KNOWN- Intel on table has a default action of "take intel" - use for fun?
+//IDEA- Cleanup old wrecks/replace with 3d icons?
+//IDEA- Randomization option for aircraft
+//IDEA- Gruppe Adler-like replay functionality for runs
 
 
 // ----------------------------------CURRENTLY AT:--------------------------------------
 // ----------------------------------CURRENTLY AT:--------------------------------------
 /* 
 
+map markers. best bet for now seems to be drawPolygon or get back into the bog of icons
+
+canyonRun_fnc_planeList is working off of an array rather than a switch/do/case type deal
+table of aircraft string names is generated on the server independently from planeList
+
+let's find out if we can tie game master to the top one slot
+seems like naming the unit is preferable
+there are a few problems to solve though
+	- check if ANYONE is occupying the game master slot dead or alive
+	- check if a specific player is occupying the gamePL master slot
+	- don't loose track if the slot is left empty or repopulated
 
 */
 // ----------------------------------CURRENTLY AT:--------------------------------------
@@ -106,8 +121,8 @@ Functionality for release should be:
 
 
 // Debug and development mode switches
-canyonRun_var_debug = false;
-canyonRun_var_devMode = false;
+canyonRun_var_debug = true;
+canyonRun_var_devMode = true;
 canyonRun_var_aircraft = "I_Plane_fighter_04_F";
 canyonRun_var_pilot = player;
 canyonRun_var_scenarioLive = false;	// variable to start the scenario
@@ -139,6 +154,8 @@ canyonRun_fnc_compileAll = {
 	publicVariable "canyonRun_fnc_updateScore";
 	canyonRun_fnc_clientCode = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_clientCode.sqf";
 	publicVariable "canyonRun_fnc_clientCode";
+	canyonRun_fnc_mapTracking = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_mapTracking.sqf";
+	publicVariable "canyonRun_fnc_mapTracking";
 	fnc_test = compile preprocessFileLineNumbers "CANYONRUN\fnc_test.sqf";
 	publicVariable "fnc_test";
 	
@@ -153,8 +170,9 @@ canyonRun_fnc_compileAll = {
 
 if (isServer) then {	// run on dedicated server or player host
 	
-	[] call canyonRun_fnc_playerManagement; // This will take proper action when people join or leave the session
 
+	[] call canyonRun_fnc_playerManagement; // This will take proper action when people join or leave the session
+	
 	/*
 	*
 	*	The server will generate a list of available aircraft and broadcast that to all the clients.
@@ -196,7 +214,27 @@ if (isServer) then {	// run on dedicated server or player host
 	// Initialize enemies only run by the server
 	[] call canyonRun_fnc_enemies;
 
-	
+
+	// Draw a rectangle over every trigger placed in the editor containing the word "boundry"
+	_list = allMissionObjects "EmptyDetector";
+	systemchat str _list;
+	{
+	_search = ["boundry", str _x, false] call BIS_fnc_inString;
+		if (_search) then {
+			_pos = getPos _x;
+			_dimX = (triggerArea _x) select 0;
+			_dimY = (triggerArea _x) select 1;
+			_rotZ = (triggerArea _x) select 2;
+
+			_myMarkerName= format ["%1",str _x];
+			_myMarker = createMarker [_myMarkerName, _pos];
+			_myMarker setMarkerSize [_dimX,_dimY];
+			_myMarker setMarkerDir _rotZ;
+			_myMarker setMarkerShape "RECTANGLE"; 
+		};
+	} forEach _list;
+
+
 	// ---------------------------------------------------------------------
 	//					Single player specific code
 	// ---------------------------------------------------------------------
@@ -209,17 +247,25 @@ if (isServer) then {	// run on dedicated server or player host
 	// This is where the gameplay loop should kick off
 	[] spawn canyonRun_core_mainLoop;
 
+
+
+
+
+
 };	// End of server-side only executed code
 
 
 
-if (hasInterface) then {	// run on all player clients incl. player host
+if (hasInterface) then {	// run on all player clients including player host
 
+
+	// Initialize the diary entry
+	[] execVM "CANYONRUN\canyonRun_core_diary.sqf";
 	
 	// Let each player execute the GUI
 	[] execVM "CANYONRUN\canyonRun_gui\canyonRun_gui_init.sqf";
 
-	
+
 
 
 	// ---------------------------------------------------------------------

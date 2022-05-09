@@ -9,3 +9,5 @@ class Header
 {
 	gameType = Coop; // MP mission type
 };
+
+

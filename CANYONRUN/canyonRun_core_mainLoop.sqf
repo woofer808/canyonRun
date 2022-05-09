@@ -79,7 +79,9 @@ while {true} do { // for now no need to be able to stop this loop, people will h
 
 
 	// This might mean timing issues but we'll leave that to tomorrow me
+	// Publish the current function to the next client to fly
 	_pilotClientID publicVariableClient "canyonrun_fnc_runFlight";
+	// Then run it on the target client machine
 	[_pilotUID] remoteExec ["canyonrun_fnc_runFlight",_pilotClientID];
 	
 	// Run the camera setup on all machines except where the current pilot is local

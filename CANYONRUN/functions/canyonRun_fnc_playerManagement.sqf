@@ -107,3 +107,55 @@ addMissionEventHandler ["PlayerDisconnected",
 }];
 
 
+
+// This function receives data from a client and updates the playerList array locally on the server
+// Do I specify data+address or should it be data type+data
+// Let's have the client request a type of update and then what the client wants
+
+
+/**
+For testing what's below
+
+[] call canyonRun_fnc_compileAll;
+systemchat str canyonRun_var_playerList;
+_uid = getplayeruid player;
+_dataType = "planeSelection";
+_data = "B_Plane_CAS_01_dynamicLoadout_F";
+[_uid,_dataType,_data] call canyonRun_fnc_updatePlayerList;
+systemchat str canyonRun_var_playerList;
+
+ */
+
+// To call it, use:
+// [_clientUID,_dataType,_data] remoteExec ["canyonRun_fnc_updatePlayerList",2];
+canyonRun_fnc_updatePlayerList = {
+
+	private _uid = _this select 0;			// UID of the client requesting an update
+	private _dataType = _this select 1;		// string: "planeSelection" and such
+	private _data = _this select 2;			// The data sent over from the client
+
+
+	// If the data type coming in is "planeSelection" then find the unit based on UID,
+	// check the planeList for the selection
+	// and finally update the playerList with the new aircraft class name
+	if (_dataType == "planeSelection") then {
+
+		// Need a test in here to make sure that the data sent worked in planeList
+		// before trying to set it - MIGHT NEED REWRITE OF planeList TO ARRAY
+
+
+		// First we find the path to the requesting client in playerList based on UID
+		_path = [canyonRun_var_playerList, _uid] call BIS_fnc_findNestedElement;
+		
+		// Set the element directly by changing _path to match it's position in the client's array
+		_path set [1,2]; // turns [0,1] to [0,2] in the case of player host in MP
+		[canyonRun_var_playerList, _path,_data] call BIS_fnc_setNestedElement;
+
+		// Distribute it over the network
+		publicVariable "canyonRun_var_playerList";
+	};
+
+
+};
+
+
