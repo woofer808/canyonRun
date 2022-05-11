@@ -37,7 +37,7 @@ class canyonRun_gui_dialogMain {
 			x = 0.30 * safezoneW + safezoneX;
 			y = 0.69 * safezoneH + safezoneY;
 			tooltip = "";
-			action = "closeDialog 0;[canyonRun_var_pilot,canyonRun_var_aircraft] spawn canyonrun_fnc_runFlight";
+			action = "closeDialog 0;[canyonRun_var_aircraft] spawn canyonrun_fnc_runFlight";
 		};
 		
 		

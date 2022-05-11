@@ -1,1 +1,2 @@
-systemchat "ran test script";
+// [] execVM "CANYONRUN\fnc_test.sqf";
+

@@ -1,6 +1,6 @@
 /*
 *
-*		CANYON RUN
+*		CANYON RUN GUI
 *
 */
 
@@ -17,10 +17,6 @@ canyonRun_fnc_guiDebug = {};
 canyonRun_var_guiDebugCheckboxState = false;
 
 
-
-
-
-
 /*
 ID's
 These numbers has to match what's defined in canyonRun_gui_dialogs.hpp
@@ -29,8 +25,6 @@ canyonRun_id_guiDialogMain = 909;
 canyonRun_id_guiDebugCheckbox = 910;
 canyonRun_id_selectPilot = 911;
 canyonRun_id_selectAircraft = 912;
-
-
 
 /*
 functions

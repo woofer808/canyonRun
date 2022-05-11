@@ -23,7 +23,7 @@ private _throttle = airplaneThrottle _aircraftObject;		// Declaration
 private _fuelLoss = 0;										// Declaration
 private _throttleCoeff = 0;									// Declaration
 
-private _aircraftProperties = [_aircraftObject] call canyonrun_fnc_planeList;	// Get the properties of the current aircraft
+private _aircraftProperties = [typeOf _aircraftObject] call canyonrun_fnc_planeList;	// Get the properties of the current aircraft
 
 
 // The smoke was originally here to simulate the fuel leak, but right now it's used as a way to illustrate the flight path.

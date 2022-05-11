@@ -67,26 +67,26 @@ What would be the best way to update the master array on the server? I see two m
  */
 
 
-private _pilotUID = _this select 0;	// The player that is to get the score
+private _pilotUID = _this select 0;	    // The player that is to get the score
 private _score = _this select 1;		// Recieves the new score from the client
 
 // First we find the pilot in the array
 _pilotArrayIndex = [canyonRun_var_playerList,_pilotUID] call BIS_fnc_findNestedElement;
-_pilotArrayIndex = _pilotArrayIndex select 0;
 
-// Now that we know which row to edit, update the correct value at that location
-// Apparently you can't edit the cell you want immediately with an array as index:
-// canyonRun_var_playerList set [[_pilotArrayIndex,3],_score];
-// I suppose plucking it out and updating it will update the value in the main array  anyway
-_pilotArray = (canyonRun_var_playerList select _pilotArrayIndex);
+// Make a path to the last score element
+private _lastScorePath = [(_pilotArrayIndex select 0), 3];
 
 // Set last score
-_pilotArray set [3,_score];
+[canyonRun_var_playerList,_lastScorePath,_score] call BIS_fnc_setNestedElement;
+
+// Make a path to the element containing the high score
+private _hiScorePath = [(_pilotArrayIndex select 0), 4];
 
 // Set high score if achieved
-_hiScore =  _pilotArray select 4;
+// This needs to happen on all clients, I think
+private _hiScore = [canyonRun_var_playerList,_hiScorePath] call BIS_fnc_returnNestedElement;
 if ( _score > _hiScore ) then {
-	_pilotArray set [4,_score];
+    [canyonRun_var_playerList,_hiScorePath,_score] call BIS_fnc_setNestedElement;
 	systemchat format ["new high score! %1 points",_score];
 };
 

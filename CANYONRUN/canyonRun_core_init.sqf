@@ -60,18 +60,19 @@ Functionality for beta should be:
 - kill messages (killed by enemy or crash)
 - JIP verification
 - Live monitoring of aircraft fuel level for all players
-- game master
+x game master
 - GUI for game master
 - several aircraft
 - GUI for changing player queue order by game master
-- markers/explanations on map
+- mission markers/explanations on map
 - scoreboard
 x instructions in diary
 - instructions in camp
 - win condition or max score condition
-- CBA option for exiting observation screen
+x CBA option for exiting observation screen
 x Sound effect for engine failure
 x visual cue for engine failure
+- Explore replay with either 2D map version or with unitcapture decide on feasability
 - suggestions
 
 Functionality for release should be:
@@ -84,16 +85,19 @@ Functionality for release should be:
 
 -------------------------------------------------------------------------------------- */
 
-//KNOWN- If player is in camera when run starts, the spawned F1 keypress is left alive.
 //KNOWN- Intel on table has a default action of "take intel" - use for easter egg/enemy pos?
-//TODO- High score message for clients is shown on server
+//KNOWN- Point get audio is played on all clients
+//TODO- High score message for clients is shown only on server
+//TODO- Fade out and in upon starting run - locally only mind otherwise we won't bother
 //TODO- Update clientCode to work in SP conditions sith SP_PLAYER UID
+//TODO- Move function compilation onto the server and publicVariable as needed
 //IDEA- Mark player crashes on the map in some good way - maybe the latest only?
 //IDEA- Make camera use different spots for each section of the circuit
 //IDEA- TFAR pre-configured channels for aircraft and radios on pilots
 //IDEA- Cleanup old wrecks/replace with 3d icons?
 //IDEA- Randomization option for aircraft
-//IDEA- Gruppe Adler-like replay functionality for runs
+//IDEA- Gruppe Adler-like replay functionality for runs or use 
+//TODO- Put an eventhandler on p0 so that the scripts know when he is connecting or disconnecting
 
 
 // ----------------------------------CURRENTLY AT:--------------------------------------
@@ -102,15 +106,19 @@ Functionality for release should be:
 
 map markers. best bet for now seems to be drawPolygon or get back into the bog of icons
 
-canyonRun_fnc_planeList is working off of an array rather than a switch/do/case type deal
-table of aircraft string names is generated on the server independently from planeList
+now that we have a way to check if game master slot is occupied,
+maybe time to start looking at the GUI?
 
-let's find out if we can tie game master to the top one slot
-seems like naming the unit is preferable
-there are a few problems to solve though
-	- check if ANYONE is occupying the game master slot dead or alive
-	- check if a specific player is occupying the gamePL master slot
-	- don't loose track if the slot is left empty or repopulated
+update gui controls so that
+canyonRun_fnc_updatePlayerList is used when selecting a new aircraft
+
+
+Add a test so that when there is a player in game master slot, the timer disappears
+and all control to start next flight goes to the game master.
+
+
+Put compiling of functions on the server, but publicVariable the ones that need to be
+local to each client. decide which goes where.
 
 */
 // ----------------------------------CURRENTLY AT:--------------------------------------
@@ -129,47 +137,46 @@ canyonRun_var_scenarioLive = false;	// variable to start the scenario
 canyonRun_var_activeRun = false; // Used to indicate wether there is an active run currently going on
 
 
-// Functions to be compiled, currently done on all clients but might be wise to move to server
-canyonRun_fnc_compileAll = {
-
-	canyonRun_core_mainLoop = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_mainLoop.sqf";
-	publicVariable "canyonRun_core_mainLoop";
-	canyonRun_fnc_playerManagement = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerManagement.sqf";
-	publicVariable "canyonRun_fnc_playerManagement";
-	canyonRun_fnc_playerQueue = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerQueue.sqf";
-	publicVariable "canyonRun_fnc_playerQueue";
-	canyonRun_fnc_debug = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_debug.sqf";
-	publicVariable "canyonRun_fnc_debug";
-	canyonRun_fnc_planeList = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_planeList.sqf";
-	publicVariable "canyonRun_fnc_planeList";
-	canyonRun_fnc_fuelLeak = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_fuelLeak.sqf";
-	publicVariable "canyonRun_fnc_fuelLeak";
-	canyonrun_fnc_runFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonrun_fnc_runFlight.sqf";
-	publicVariable "canyonrun_fnc_runFlight";
-	canyonRun_fnc_enemies = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_enemies.sqf";
-	publicVariable "canyonRun_fnc_enemies";
-	canyonRun_fnc_observerScreen = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_observerScreen.sqf";
-	publicVariable "canyonRun_fnc_observerScreen";
-	canyonRun_fnc_updateScore = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_updateScore.sqf";
-	publicVariable "canyonRun_fnc_updateScore";
-	canyonRun_fnc_clientCode = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_clientCode.sqf";
-	publicVariable "canyonRun_fnc_clientCode";
-	canyonRun_fnc_mapTracking = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_mapTracking.sqf";
-	publicVariable "canyonRun_fnc_mapTracking";
-	fnc_test = compile preprocessFileLineNumbers "CANYONRUN\fnc_test.sqf";
-	publicVariable "fnc_test";
-	
-	if (canyonRun_var_debug) then {
-		["scripts compiled"] call canyonRun_fnc_debug;
-	};
-
-};
-[] call canyonRun_fnc_compileAll;
-
-
-
 if (isServer) then {	// run on dedicated server or player host
-	
+
+	// Functions to be compiled
+	canyonRun_fnc_compileAll = {
+
+		canyonRun_core_mainLoop = compile preprocessFileLineNumbers "CANYONRUN\canyonRun_core_mainLoop.sqf";
+		//publicVariable "canyonRun_core_mainLoop"; // Serverside only
+		canyonRun_fnc_playerManagement = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerManagement.sqf";
+		publicVariable "canyonRun_fnc_playerManagement";
+		canyonRun_fnc_playerQueue = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_playerQueue.sqf";
+		publicVariable "canyonRun_fnc_playerQueue";
+		canyonRun_fnc_debug = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_debug.sqf";
+		publicVariable "canyonRun_fnc_debug";
+		canyonRun_fnc_planeList = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_planeList.sqf";
+		publicVariable "canyonRun_fnc_planeList"; // Send to clients
+		canyonRun_fnc_fuelLeak = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_fuelLeak.sqf";
+		publicVariable "canyonRun_fnc_fuelLeak"; // Send to clients
+		canyonrun_fnc_runFlight = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonrun_fnc_runFlight.sqf";
+		publicVariable "canyonrun_fnc_runFlight"; // Send to clients
+		canyonRun_fnc_enemies = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_enemies.sqf";
+		//publicVariable "canyonRun_fnc_enemies"; // Serverside only
+		canyonRun_fnc_observerScreen = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_observerScreen.sqf";
+		publicVariable "canyonRun_fnc_observerScreen";
+		canyonRun_fnc_updateScore = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_updateScore.sqf";
+		publicVariable "canyonRun_fnc_updateScore";
+		canyonRun_fnc_clientCode = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_clientCode.sqf";
+		publicVariable "canyonRun_fnc_clientCode";
+		canyonRun_fnc_mapTracking = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_mapTracking.sqf";
+		publicVariable "canyonRun_fnc_mapTracking";
+		fnc_test = compile preprocessFileLineNumbers "CANYONRUN\fnc_test.sqf";
+		publicVariable "fnc_test";
+		
+		if (canyonRun_var_debug) then {
+			["scripts compiled"] call canyonRun_fnc_debug;
+		};
+
+	};
+	[] call canyonRun_fnc_compileAll;
+
+
 
 	[] call canyonRun_fnc_playerManagement; // This will take proper action when people join or leave the session
 	
@@ -200,7 +207,7 @@ if (isServer) then {	// run on dedicated server or player host
 		// If the vic isn't a UAV, add it to the aircraft list along with it's pretty name
 		if !(_isUAV) then {
 			// Put the vic in the array
-			canyonRun_var_aircraftList pushBack [[_x] call BIS_fnc_displayName,configName _x];
+			canyonRun_var_aircraftList pushBack [configName _x,[_x] call BIS_fnc_displayName];
 		};
 
 		// Delete the temporary aircraft
@@ -217,7 +224,6 @@ if (isServer) then {	// run on dedicated server or player host
 
 	// Draw a rectangle over every trigger placed in the editor containing the word "boundry"
 	_list = allMissionObjects "EmptyDetector";
-	systemchat str _list;
 	{
 	_search = ["boundry", str _x, false] call BIS_fnc_inString;
 		if (_search) then {
@@ -267,6 +273,11 @@ if (hasInterface) then {	// run on all player clients including player host
 
 
 
+	// This is to keep track of when the server sends a variable
+	"canyonRun_var_aircraftProperties" addPublicVariableEventHandler {
+		systemchat format ["%1 has been updated to: %2",_this select 0,_this select 1];
+	};
+
 
 	// ---------------------------------------------------------------------
 	//					Observer screen initialization
@@ -286,18 +297,71 @@ if (hasInterface) then {	// run on all player clients including player host
 	canyonRun_var_camera camSetTarget canyonRun_var_spawnFlag;
 	canyonRun_var_camera camCommit 0;
 
+
+
+
+
+		/* -------------------------------------------------------------------------------------------------------
+			Open GUI - F1-key
+		   ------------------------------------------------------------------------------------------------------- */
+		// Define the function that is to run when the CBA bound key is pressed.
+		canyonRun_fnc_keyGUI = {
+			// Only open the dialog if it's not already open
+			if (isNull (findDisplay canyonRun_id_guiDialogMain)) then {createDialog "canyonRun_gui_dialogMain";} else {closeDialog 0};
+			["F1-key pressed.",true,true] call canyonRun_fnc_debug;
+		};
+
+		// Assign the key depending on CBA being loaded or not
+		if (isClass(configFile >> "CfgPatches" >> "cba_main_a3")) then {
+
+			// [ "addonName" , "actionID" , ["pretty name","tooltip"] , {downCode} , {upCode} ]
+			["canyonRun","guiKey", ["show control window", "Show or hide canyonRun controls."], {_this spawn canyonRun_fnc_keyGUI}, {}, [59, [false, false, false]]] call CBA_fnc_addKeybind;
+
+		} else {
+			
+			// This key needs to be persistent
+			[] spawn {
+				while {true} do {
+					waituntil {(inputAction "SelectGroupUnit1" > 0)};
+					[] spawn canyonRun_fnc_keyGUI;
+					waituntil {inputAction "SelectGroupUnit1" <= 0};
+				};
+			};
+		};
+
+		/* -------------------------------------------------------------------------------------------------------
+		    Stop camera  - F2-key
+	   	   ------------------------------------------------------------------------------------------------------- */
+		canyonRun_fnc_keyExitCamera = {
+			canyonrun_var_camera cameraEffect ["internal", "BACK","stream"];
+			["F2-key pressed.",true,true] call canyonRun_fnc_debug;
+		 };
+
+		// Assign the key depending on CBA being loaded or not
+		if (isClass(configFile >> "CfgPatches" >> "cba_main_a3")) then {
+
+			// [ "addonName" , "actionID" , ["pretty name","tooltip"] , {downCode} , {upCode} ]
+			["canyonRun","stopCamera", ["stop observation camera", "Shuts down the observation camera if it has been entered into."], {_this spawn canyonRun_fnc_keyExitCamera}, {}, [60, [false, false, false]]] call CBA_fnc_addKeybind;
+
+		} else {
+			
+			// This key needs to be persistent
+			[] spawn {
+				while {true} do {
+					waituntil {(inputAction "SelectGroupUnit2" > 0)};
+					[] spawn canyonRun_fnc_keyExitCamera;
+					waituntil {inputAction "SelectGroupUnit2" <= 0};
+				};
+			};
+		};
+
+
+
 	// Give player option to go fullscreen on the camera
 	canyonRun_var_screen addAction ["fullscreen observation",
 		{
 			canyonrun_var_camera cameraEffect ["internal", "BACK"];
-			systemChat "----> Press F1 to get out of camera";
-
-			[] spawn {
-				//moduleName_keyDownEHId = (findDisplay 46) displayAddEventHandler ["KeyDown", "hint str _this;"];
-				waituntil {(inputAction "SelectGroupUnit1" > 0)};
-				canyonrun_var_camera cameraEffect ["internal", "BACK","stream"];
-				systemChat "key pressed";
-			};
+			systemChat "----> Press F2 to get out of camera (or key you bound in CBA settings)";
 		}
 	];
 
@@ -307,8 +371,15 @@ if (hasInterface) then {	// run on all player clients including player host
 	// Set the scenario loose by setting the varible to true and broadcasting it to all clients
 	canyonRun_var_spawnFlag addAction ["start scenario",{
 		missionNamespace setVariable ["canyonRun_var_scenarioLive", true, true];
-		["Scenario is LIVE"] remoteExec ["systemchat",0];
-		removeAllActions canyonRun_var_spawnFlag;
+		
+		{cutText ["<br/><br/><br/><t color='#00ff00' size='4'>Scenario is LIVE!</t>", "PLAIN", 0.3, true, true]} remoteExec ["call",0];
+
+		// str _this = [object_var,activatingPlayer,actionID,<null>]
+		canyonRun_var_spawnFlag removeAction (_this select 2); // removes this addAction
+	}];
+
+	canyonRun_var_spawnFlag addAction ["controls",{
+		createDialog "canyonRun_gui_dialogMain";
 	}];
 
 

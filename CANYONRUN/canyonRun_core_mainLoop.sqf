@@ -21,13 +21,11 @@ while {true} do { // for now no need to be able to stop this loop, people will h
 
 
 
-	// Show a countdown on each machine before the next run initiates
+	// Each machine need to either wait for the game master to start people on their run
+	// or in the case of no game master they will wait for the roundtime counter to finish
 	[0,{
-		// First we need a countdown timer between runs
-		// Let's display it as a hint for now,
-		// but would look nicer as a message every ten seconds before counting down the last few seconds.
-		// This should be synced up between clients using mission time
 		
+		// The timer has a different length depending on whether devMode is on or off
 		private _waitTime = 60;
 		if (canyonRun_var_devMode) then {
 			_waitTime = 6;
@@ -35,12 +33,26 @@ while {true} do { // for now no need to be able to stop this loop, people will h
 			_waitTime = 30;
 		};
 
-		for "_i" from _waitTime to 1 step -1 do {
-			_pilotName = (canyonRun_var_playerList select 0) select 1;
-			hintSilent format ["Next pilot %1 to start in %2 seconds", _pilotName,_i];
-			sleep 1;
+		// Detect whether there is someone in the game master slot
+		private _gameMaster = call canyonRun_fnc_gameMasterCheck;
+		if (_gameMaster) then {
+
+			// Wait for something if there is a game master
+			canyonRun_fnc_gameMasterHold = true;
+			waitUntil {!canyonRun_fnc_gameMasterHold && !canyonRun_var_activeRun};
+
+		} else {
+
+			// Since there is no game master, the system need to run automatically
+			for "_i" from _waitTime to 1 step -1 do {
+				_pilotName = (canyonRun_var_playerList select 0) select 1;
+				hintSilent format ["Next pilot %1 to start in %2 seconds", _pilotName,_i];
+				sleep 1;
+			};
+			hintSilent ""; // Clear the hint
+
 		};
-		hintSilent ""; // Clear the hint
+
 
 		// Only the server needs this, but for now it's set on all clients right after the counter is done
 		canyonRun_var_activeRun = true;
@@ -73,7 +85,6 @@ while {true} do { // for now no need to be able to stop this loop, people will h
 	// Now we are actually ready to reorder the player list so that we get the next dude in line correctly
 	// In case someone wants to manipulate the order during someone else's run
 	[_pilotUID,"last"] call canyonRun_fnc_playerQueue; // Move player of this UID to last in queue
-
 
 
 

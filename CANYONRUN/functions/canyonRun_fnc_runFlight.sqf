@@ -81,6 +81,8 @@ _aircraftObject = createVehicle [_aircraftType, getPos startLocation, [], 0, "FL
 // Set the vehicle pointing the correct starting direction.
 [_aircraftObject, 60] call KK_fnc_setDirFLY;
 
+[1, "BLACK", 2, 1] spawn BIS_fnc_fadeEffect;
+
 // Shove the player into the cockpit
 _pilot moveInDriver _aircraftObject;
 

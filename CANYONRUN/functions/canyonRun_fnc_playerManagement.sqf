@@ -141,7 +141,11 @@ canyonRun_fnc_updatePlayerList = {
 	if (_dataType == "planeSelection") then {
 
 		// Need a test in here to make sure that the data sent worked in planeList
-		// before trying to set it - MIGHT NEED REWRITE OF planeList TO ARRAY
+		// before trying to set it
+		_aircraft = [_data] call canyonRun_fnc_planeList;
+		if (_aircraft == -1) exitWith {
+			["Data selection failed: planeList returned -1"] call canyonRun_fnc_debug;
+		};
 
 
 		// First we find the path to the requesting client in playerList based on UID
@@ -159,3 +163,58 @@ canyonRun_fnc_updatePlayerList = {
 };
 
 
+
+/*
+let's find out if we can tie game master to the top one slot
+there are a few problems to solve though
+	- check if ANYONE is occupying the game master slot dead or alive
+	- check if a specific player is occupying the gamePL master slot
+	- don't loose track if the slot is left empty or repopulated
+seems like naming the unit is what is left to us. So maybe checking that p0 is alive?
+
+This is the only working piece of shit code I have that can check for an possible
+unexisting unit: if (isNil "p0") then {systemchat "weee"};
+
+Gonna have to compound this I suppose
+	- First check if p0 is even spawned in with isNil "p0"
+	- Second, check if that unit is a player with isPlayer p0 to rule out possible AI
+	- Within that, find out the UID of the player of p0
+
+What if p0 has logged in and then disconnected or swapped slot? Now there should be an object 
+defined called p0 that at least WAS a player. that has to be tested
+
+There is also the question of how the game should work when there is no game master in that slot
+Aaaah, but you see then of course everything just rolls along timed between runs.
+
+Honestly - one player should have a shorter timer than multiple players, right?
+*/
+
+// I think I need a continuous way to check if the game master slot is occupied
+// But until that need presents itself, for now I'll just do a function that can be run to check
+// Maybe it's even better to check for players in the p0 slot at need, cause it wont' happen often
+canyonRun_fnc_gameMasterCheck = {
+
+	private _return = false;
+
+	["Checking for game master..."] call canyonRun_fnc_debug;
+
+	if (!isNil "p0") then {
+		
+		if (isPlayer p0) then {
+		
+		["p0 is a player that uses the first slot"] call canyonRun_fnc_debug;
+		_return = true;
+
+		};
+
+	} else {
+
+		["No player in p0 slot"] call canyonRun_fnc_debug;
+
+		_return = false
+
+	};
+
+	_return;
+
+};

@@ -101,7 +101,6 @@ _groupLeaders = _units select {side _x == east && (!isPlayer _x)};
 	_arrayElement = [_type, _pos, _dir]; 
 	canyonRun_var_enemyArray pushBack _arrayElement;
 
-	systemchat str _arrayElement; 
 
 } forEach _groupLeaders;
 

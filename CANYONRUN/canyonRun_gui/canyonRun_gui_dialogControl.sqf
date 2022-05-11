@@ -72,7 +72,7 @@ canyonRun_fnc_setPilot = {
 // Populates the aircraft list
 private _aircraftSelection = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_selectAircraft; // Define the displaycontrol
 {
-	_aircraftSelection lbAdd (_x select 0);
+	_aircraftSelection lbAdd (_x select 1);
 } forEach canyonRun_var_aircraftList;
 
 // After loading gui, set the dropdown to its current value
@@ -85,5 +85,5 @@ canyonRun_fnc_setAircraft = {
 	// Find the control
 	private _setAircraft = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_selectAircraft;
 	private _selectedAircraft = lbCurSel _setAircraft;	// Checks state of drop-down
-	canyonRun_var_aircraft = (canyonRun_var_aircraftList select _selectedAircraft) select 1;
+	canyonRun_var_aircraft = (canyonRun_var_aircraftList select _selectedAircraft) select 0;
 };
