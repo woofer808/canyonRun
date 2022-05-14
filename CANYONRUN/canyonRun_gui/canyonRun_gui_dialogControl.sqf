@@ -57,8 +57,6 @@ canyonRun_fnc_setPilot = {
 	private _selectedPilot = lbCurSel _setPilot;	// Checks state of drop-down
 	canyonRun_var_pilot = canyonRun_var_playerList select _selectedPilot;
 
-	systemChat str _selectedPilot;
-	systemChat str canyonRun_var_pilot select _selectedPilot;
 };
 
 
@@ -75,8 +73,21 @@ private _aircraftSelection = (findDisplay canyonRun_id_guiDialogMain) displayCtr
 	_aircraftSelection lbAdd (_x select 1);
 } forEach canyonRun_var_aircraftList;
 
+// need the index of the currently selected aircraft
+// first we find the index based on what is currently in playerlist
+private _uid = getPlayerUID player;
+// Get the path to the current player
+private _playerPath = [canyonRun_var_playerList,_uid] call BIS_fnc_findNestedElement;
+// Make a path to the element containing the aircraft class name
+private _aircraftPath = [(_playerPath select 0), 2];
+private _presetAircraft = [canyonRun_var_playerList,_aircraftPath] call BIS_fnc_returnNestedElement;
+// Now I know what aircraft is currently in this player's array, let's find its index in aircraftList
+private _aircraftIndex = [canyonRun_var_aircraftList,_presetAircraft] call BIS_fnc_findNestedElement;
+// Now we know the path to the selection so we'll just use the first number
+private _selectedIndex = (_aircraftIndex select 0);
+
 // After loading gui, set the dropdown to its current value
-lbSetCurSel [canyonRun_id_selectAircraft, 0];
+lbSetCurSel [canyonRun_id_selectAircraft, _selectedIndex];
 
 
 
@@ -84,6 +95,23 @@ lbSetCurSel [canyonRun_id_selectAircraft, 0];
 canyonRun_fnc_setAircraft = {
 	// Find the control
 	private _setAircraft = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_selectAircraft;
+	// Find the index of the just selected aircraft
 	private _selectedAircraft = lbCurSel _setAircraft;	// Checks state of drop-down
 	canyonRun_var_aircraft = (canyonRun_var_aircraftList select _selectedAircraft) select 0;
+
+	// Set the chosen aircraft classname in the playerList of the current player
+	// Get the current player UID to sort the correct player out from playerList
+	private _uid = getPlayerUID player;
+	// Get the path to the current player
+	private _playerPath = [canyonRun_var_playerList,_uid] call BIS_fnc_findNestedElement;
+	// Make a path to the element containing the aircraft class name
+	private _aircraftPath = [(_playerPath select 0), 2];
+
+	// Finally set the correct value based on the new path
+	[canyonRun_var_playerList, _aircraftPath, canyonRun_var_aircraft] call BIS_fnc_setNestedElement;
+
+	[_uid,"planeSelection",canyonRun_var_aircraft] remoteExec ["canyonRun_fnc_updatePlayerList",2];
+	{systemchat format ["sending you %1",canyonRun_var_aircraft];} remoteExec ["call",2];
+
+
 };

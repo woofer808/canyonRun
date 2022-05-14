@@ -91,6 +91,8 @@ Functionality for release should be:
 //TODO- Fade out and in upon starting run - locally only mind otherwise we won't bother
 //TODO- Update clientCode to work in SP conditions sith SP_PLAYER UID
 //TODO- Move function compilation onto the server and publicVariable as needed
+//TODO- "Scenario is LIVE" should not be obscured by the menu option or camera feed
+//TODO- No good for a party game if you can't distinguish between players. Make them dress diffrently
 //IDEA- Mark player crashes on the map in some good way - maybe the latest only?
 //IDEA- Make camera use different spots for each section of the circuit
 //IDEA- TFAR pre-configured channels for aircraft and radios on pilots
@@ -106,15 +108,14 @@ Functionality for release should be:
 
 map markers. best bet for now seems to be drawPolygon or get back into the bog of icons
 
-now that we have a way to check if game master slot is occupied,
-maybe time to start looking at the GUI?
+GUI - make "next player" work - plane selection is now properly functioning
+code needs a bit of cleanup from system messages later.
 
-update gui controls so that
-canyonRun_fnc_updatePlayerList is used when selecting a new aircraft
-
-
-Add a test so that when there is a player in game master slot, the timer disappears
-and all control to start next flight goes to the game master.
+Add a test that detects when the game master slot becomes empty. When detected:
+	- Show a warning that the game master has left
+	- Show a warning that the system will start looping games automatically in a minute
+	  or so unless the game master slot becomes occupied again.
+Also: make sure that the "start run" button first displays "start scenario"
 
 
 Put compiling of functions on the server, but publicVariable the ones that need to be
@@ -131,7 +132,7 @@ local to each client. decide which goes where.
 // Debug and development mode switches
 canyonRun_var_debug = true;
 canyonRun_var_devMode = true;
-canyonRun_var_aircraft = "I_Plane_fighter_04_F";
+canyonRun_var_aircraft = "I_Plane_Fighter_04_F";
 canyonRun_var_pilot = player;
 canyonRun_var_scenarioLive = false;	// variable to start the scenario
 canyonRun_var_activeRun = false; // Used to indicate wether there is an active run currently going on

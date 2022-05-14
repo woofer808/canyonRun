@@ -38,8 +38,8 @@ while {true} do { // for now no need to be able to stop this loop, people will h
 		if (_gameMaster) then {
 
 			// Wait for something if there is a game master
-			canyonRun_fnc_gameMasterHold = true;
-			waitUntil {!canyonRun_fnc_gameMasterHold && !canyonRun_var_activeRun};
+			canyonRun_var_gameMasterHold = true;
+			waitUntil {!canyonRun_var_gameMasterHold && !canyonRun_var_activeRun};
 
 		} else {
 
