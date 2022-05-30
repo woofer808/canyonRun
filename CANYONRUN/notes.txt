@@ -1,0 +1,84 @@
+dynamic text 
+["<t size='1' color='#ffffff' font='PuristaMedium' >KILLCHAIN IS NOW LIVE</t>",0,0.2,3,1] remoteExec ["bis_fnc_dynamictext", 0];
+
+
+
+
+
+
+
+
+
+// this is how reggs finds out who is who
+
+_playerRole = roleDescription player;
+// [_playerRole, _interfaceSize] call RGGr_fnc_roles_welcomeText;
+
+switch (_playerRole) do {
+	case "Viking 1:1 - Platoon Leader@Viking 1": {
+		// object addAction [title, script, arguments, priority, showWindow, hideOnUse, shortcut, condition, radius, unconscious, selection, memoryPoint]
+		// player addAction ["Page Viking 2 SL", { 
+		// 	{
+		// 		_role = roleDescription _x;
+		// 		if (_role == "Viking 2:1 - Squad Leader@Viking 2") then {
+		// 			["CONTACT PLATOON LEADER"] remoteExec ["RGGi_fnc_information_lowerRight", _x];
+		// 		};
+		// 	} forEach allPlayers;
+		// }];
+		// player addAction ["Page Viking 3 SL", { 
+		// 	{
+		// 		_role = roleDescription _x;
+		// 		if (_role == "Viking 2:1 - Squad Leader@Viking 2") then {
+		// 			["CONTACT PLATOON LEADER"] remoteExec ["RGGi_fnc_information_lowerRight", _x];
+		// 		};
+		// 	} forEach allPlayers;
+		// }];
+		// player addAction ["Mission Stats", { 
+		// 	[] remoteExec ["RGGi_fnc_information_showStats", player];
+
+		// }];
+		// player addAction ["DEBUG - Check assigned player vics", { 
+		// 	// _vics = [];
+		// 	{
+		// 		_assignedVic = assignedVehicle _x;
+		// 		// _vics pushBack _assignedVic;
+		// 		format ["%1 is assigned to %2", _x, _assignedVic] remoteExec ["systemChat", 0]; 
+		// 	} forEach allPlayers;
+		// 	// [_vics, player] remoteExec ["RGGu_fnc_utilities_checkAssigned", player];
+		// }];
+		// player addAction ["DEBUG - manually unassign all players", { 
+		// 	// _vics = [];
+		// 	{
+		// 		_x assignAsCargo Workaround;
+		// 		// unassignVehicle _x;
+		// 	} forEach allPlayers;
+		// 	// [_vics, player] remoteExec ["RGGu_fnc_utilities_checkAssigned", player];
+		// }];
+		// player addAction ["TINMAN - On", { 
+		// 	BLUMAN = true;
+		// 	publicVariable "BLUMAN";
+		// }];
+		// player addAction ["TINMAN - Off", { 
+		// 	BLUMAN = false;
+		// 	publicVariable "BLUMAN";
+		// }];
+		vamp = false;
+		systemChat "you have use of FNC-based voice activated systems";
+		[] spawn RGGv_fnc_voice_VAHCO_init;
+	};
+
+	case "Raptor 1 - Squadron Leader@Raptor": 			{
+		player addAction ["Eject AI", { 
+			[player] remoteExec ["RGGo_fnc_order_disembark", 2];
+		}];
+	};
+	case "Raptor 2 - Squadron 2IC@Raptor": 				{
+		player addAction ["Eject AI", { 
+			[player] remoteExec ["RGGo_fnc_order_disembark", 2];
+		}];
+	};
+	default { systemChat "" };
+
+
+
+};

@@ -1,5 +1,6 @@
 #include "CANYONRUN\canyonRun_gui\canyonRun_gui_definitions.hpp"
 #include "CANYONRUN\canyonRun_gui\canyonRun_gui_dialogs.hpp"
+#include "CANYONRUN\canyonRun_gui\canyonRun_gui_flightData.hpp"
 
 author = "woofer"; // Author
 onLoadName = "canyon run"; // Mission name (temporary solution; actual name set in editor will be used later in the alpha)

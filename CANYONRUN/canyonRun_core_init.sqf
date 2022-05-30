@@ -88,18 +88,25 @@ Functionality for release should be:
 //KNOWN- Intel on table has a default action of "take intel" - use for easter egg/enemy pos?
 //KNOWN- Point get audio is played on all clients
 //TODO- High score message for clients is shown only on server
-//TODO- Fade out and in upon starting run - locally only mind otherwise we won't bother
+//TODO- CompileAll misses to recompile the gui - maybe compileInit and compileGui and compileAll
+//TODO- Test fnc_playerQueue to have it move people to next in queue
+//TODO- 
 //TODO- Update clientCode to work in SP conditions sith SP_PLAYER UID
+//TODO- Scenario should automatically go live when there is a game master in the slot
+//TODO- Put an eventhandler on p0 so that the scripts know when he is connecting or disconnecting
+//TODO- JIP players should be told scenario is live upon connecting.
+//TODO- Game master leaving or connecting should be shown to all players
 //TODO- Move function compilation onto the server and publicVariable as needed
-//TODO- "Scenario is LIVE" should not be obscured by the menu option or camera feed
+//TODO- set a default aircraft that isn't from a DLC
 //TODO- No good for a party game if you can't distinguish between players. Make them dress diffrently
 //IDEA- Mark player crashes on the map in some good way - maybe the latest only?
+//IDEA- Gunner positions - let other people fly along
 //IDEA- Make camera use different spots for each section of the circuit
 //IDEA- TFAR pre-configured channels for aircraft and radios on pilots
 //IDEA- Cleanup old wrecks/replace with 3d icons?
 //IDEA- Randomization option for aircraft
 //IDEA- Gruppe Adler-like replay functionality for runs or use 
-//TODO- Put an eventhandler on p0 so that the scripts know when he is connecting or disconnecting
+
 
 
 // ----------------------------------CURRENTLY AT:--------------------------------------
@@ -108,18 +115,41 @@ Functionality for release should be:
 
 map markers. best bet for now seems to be drawPolygon or get back into the bog of icons
 
-GUI - make "next player" work - plane selection is now properly functioning
-code needs a bit of cleanup from system messages later.
+GUI - need a list and button selection for next pilot as with indicam "set actor list"
+drop-down needs to update the text in the window top better. it's a bit hit or miss right now
+will likely get better with the new list system
+I seem to be able to break the aircraft selection in mp as well. I keep getting p1's plane
+update: looks like it's the sorting function. If i select same person the current pilot changes
+but only if i keep selecting number two in the list. index 0 keeps landing on p0
+actually only the second selection makes any changes
+
+I don't really want the selection from game master to overwrite each client's
 
 Add a test that detects when the game master slot becomes empty. When detected:
 	- Show a warning that the game master has left
 	- Show a warning that the system will start looping games automatically in a minute
 	  or so unless the game master slot becomes occupied again.
-Also: make sure that the "start run" button first displays "start scenario"
+
 
 
 Put compiling of functions on the server, but publicVariable the ones that need to be
 local to each client. decide which goes where.
+
+Add variableEventhandler to all clients and server in order to keep the list of
+
+Add a test to each client that tests and possibly removes any aircraft classnames from the list
+that it hasn't got loaded - this to prevent the server giving options that the client can't use
+also tell the client that they do not have the same asset mods loaded as the server
+
+screen stream isn't running anymore it seems
+
+Flight data is now in for the player.
+Gonna need to decide if the player should be able to even see it, but it needs localization
+so that other player get to see it.
+Either the player does the calculation and sends over network, or each client will have to pull
+the info by themselves. not sure yet. I want it updating at 0.3 seconds. is that too much to
+send over the network?
+
 
 */
 // ----------------------------------CURRENTLY AT:--------------------------------------
@@ -167,6 +197,8 @@ if (isServer) then {	// run on dedicated server or player host
 		publicVariable "canyonRun_fnc_clientCode";
 		canyonRun_fnc_mapTracking = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_mapTracking.sqf";
 		publicVariable "canyonRun_fnc_mapTracking";
+		canyonRun_fnc_flightData = compile preprocessFileLineNumbers "CANYONRUN\functions\canyonRun_fnc_flightData.sqf";
+		publicVariable "canyonRun_fnc_flightData";
 		fnc_test = compile preprocessFileLineNumbers "CANYONRUN\fnc_test.sqf";
 		publicVariable "fnc_test";
 		
@@ -369,16 +401,19 @@ if (hasInterface) then {	// run on all player clients including player host
 
 
 	// TEMPORARY: Should probably only be executed by the game master even though each player need to be able to choose aircraft
-	// Set the scenario loose by setting the varible to true and broadcasting it to all clients
+	// Addaction to be removed and added into the GUI
 	canyonRun_var_spawnFlag addAction ["start scenario",{
+		// Set the scenario loose by setting the varible to true and broadcasting it to all clients
 		missionNamespace setVariable ["canyonRun_var_scenarioLive", true, true];
 		
-		{cutText ["<br/><br/><br/><t color='#00ff00' size='4'>Scenario is LIVE!</t>", "PLAIN", 0.3, true, true]} remoteExec ["call",0];
+		// Clearly display that the scenario is now live
+		{cutText ["<t color='#00ff00' size='4'>Scenario is LIVE!</t>", "PLAIN DOWN", 0.3, true, true]} remoteExec ["call",0];
 
 		// str _this = [object_var,activatingPlayer,actionID,<null>]
 		canyonRun_var_spawnFlag removeAction (_this select 2); // removes this addAction
 	}];
 
+	// Also temporary - Should be instructions in camp
 	canyonRun_var_spawnFlag addAction ["controls",{
 		createDialog "canyonRun_gui_dialogMain";
 	}];

@@ -152,8 +152,35 @@ private _planeList =
 		[-0.1,0,0],		// Smoke pos 1
 		[0.1,0,0]		// Smoke pos 2
 		]
+	],
+
+	/*	MOD: Super hornet */
+	[
+		"JS_JC_FA18E", // F/A-18 E Super Hornet
+		[
+		[95,0.025],		// Throttle percentage with fuel loss
+		[70,0.020],		// Throttle percentage with fuel loss
+		[55,0.010],		// Throttle percentage with fuel loss
+		[45,0.005],		// Throttle percentage with fuel loss
+		[35,0.0025],	// Throttle percentage with fuel loss
+		[-0.1,0,0],		// Smoke pos 1
+		[0.1,0,0]		// Smoke pos 2
+		]
+	],
+
+	[
+		"JS_JC_FA18F", // F/A-18 F Super Hornet
+		[
+		[95,0.025],		// Throttle percentage with fuel loss
+		[70,0.020],		// Throttle percentage with fuel loss
+		[55,0.010],		// Throttle percentage with fuel loss
+		[45,0.005],		// Throttle percentage with fuel loss
+		[35,0.0025],	// Throttle percentage with fuel loss
+		[-0.1,0,0],		// Smoke pos 1
+		[0.1,0,0]		// Smoke pos 2
+		]
 	]
-		
+	
 ]; // End of plane list array
 
 

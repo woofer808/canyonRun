@@ -6,10 +6,6 @@ waitUntil {dialog};
 
 
 
-
-
-
-
 // Upon opening of gui, let the control show the current selected value
 private _debugControl = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_guiDebugCheckbox; // Define the displaycontrol
 if (canyonRun_var_guiDebugCheckboxState or canyonRun_var_debug) then {
@@ -55,8 +51,16 @@ canyonRun_fnc_setPilot = {
 	// Find the control
 	private _setPilot = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_selectPilot;
 	private _selectedPilot = lbCurSel _setPilot;	// Checks state of drop-down
-	canyonRun_var_pilot = canyonRun_var_playerList select _selectedPilot;
+	_pilotArray = canyonRun_var_playerList select _selectedPilot;
+	// This is where we update playerlist so that the next selected pilot ends up at the very top of the list
+	private _uid = _pilotArray select 0;
+	[_uid,"first"] call canyonRun_fnc_playerQueue;
 
+	// Update the text displaying next pilot
+	private _currentPilotDisplay = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_nextPilotDisplay; // Define the displaycontrol
+	_currentPilotDisplay ctrlSetText format ['Next pilot: %1', (_pilotArray select 1)];
+
+	systemchat str canyonRun_var_playerList;
 };
 
 
@@ -113,5 +117,15 @@ canyonRun_fnc_setAircraft = {
 	[_uid,"planeSelection",canyonRun_var_aircraft] remoteExec ["canyonRun_fnc_updatePlayerList",2];
 	{systemchat format ["sending you %1",canyonRun_var_aircraft];} remoteExec ["call",2];
 
-
 };
+
+
+
+
+
+// Update the text showing who the next pilot will be
+private _currentPilotDisplay = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_nextPilotDisplay; // Define the displaycontrol
+private _pilotName = [canyonRun_var_playerList, [0,1]] call BIS_fnc_returnNestedElement;
+_currentPilotDisplay ctrlSetText format ['Next pilot: %1', _pilotName];
+
+

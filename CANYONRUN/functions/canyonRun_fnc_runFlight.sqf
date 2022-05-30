@@ -175,6 +175,11 @@ canyonRun_fnc_outOfBounds = {
 [_aircraftObject] spawn canyonRun_fnc_fuelLeak;
 
 
+// Start the flight data stream
+//[_pilot] spawn canyonRun_fnc_flightData;
+[_pilot] remoteExec ["canyonRun_fnc_flightData",0];
+
+
 // ---------------------------------------- End of run ----------------------------------------
 
 waitUntil {!canyonRun_var_activeRun};

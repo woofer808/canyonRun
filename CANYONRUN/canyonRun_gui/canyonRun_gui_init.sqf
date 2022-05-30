@@ -25,6 +25,13 @@ canyonRun_id_guiDialogMain = 909;
 canyonRun_id_guiDebugCheckbox = 910;
 canyonRun_id_selectPilot = 911;
 canyonRun_id_selectAircraft = 912;
+canyonRun_id_startRun = 913;
+canyonRun_id_nextPilot = 914;
+canyonRun_id_nextPilotDisplay = 915;
+canyonRun_id_buttonAutoQueue = 916;
+
+canyonRun_id_flightDataS = 950;
+canyonRun_id_flightDataStream = 951;
 
 /*
 functions
