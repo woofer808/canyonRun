@@ -1,5 +1,21 @@
 /*
 
+------------------------------------------------------------------------------------------
+[] spawn canyonRun_fnc_flightData;
+------------------------------------------------------------------------------------------
+
+It will stream flight data of the current pilot on screen so that those who do not fly can
+follow along with what is going on better.
+
+Runs locally on the current pilot machine. Streams data over network pretty heavily since
+getting fuel levels and points from an aircraft owned by another machine is spotty at best.
+
+It uses formatting from canyonRun_gui\canyonRun_gui_flightData.hpp
+
+Params: _unit
+Returns: nothing
+
+------------------------------------------------------------------------------------------
 
 
 Code is stolen (with blessings) from Regg's Killchain and then adapted to this:
@@ -27,11 +43,10 @@ while {var_counter < 100} do {
 params ["_unit"];
 
 
-
-
 canyonRun_fnc_flightDataStream = {
 
-	private _text = _this;
+	params ["_text"];
+
 
 	disableSerialization;
 	700 cutRsc ["FLIGHTDATA_MESSAGE", "PLAIN"];
@@ -41,23 +56,24 @@ canyonRun_fnc_flightDataStream = {
 	_setText ctrlSetBackgroundColor [0,0,0,0.5];
 
 };
+publicVariable "canyonRun_fnc_flightDataStream";
 
 private _name = name _unit;
 
 while {canyonRun_var_activeRun} do {
 
-private _fuel = (fuel (vehicle _unit)) * 100;
-_fuel = [_fuel, 0] call BIS_fnc_cutDecimals;
+	private _fuel = (fuel (vehicle _unit)) * 100;
+	_fuel = [_fuel, 0] call BIS_fnc_cutDecimals;
 
-private _throttle = 100 * (airplaneThrottle (vehicle _unit));
-_throttle = [_throttle, 0] call BIS_fnc_cutDecimals;
+	private _throttle = 100 * (airplaneThrottle (vehicle _unit));
+	_throttle = [_throttle, 0] call BIS_fnc_cutDecimals;
 
 
-private _speed = speed (vehicle _unit);
-_speed = [_speed, 0] call BIS_fnc_cutDecimals;
+	private _speed = speed (vehicle _unit);
+	_speed = [_speed, 0] call BIS_fnc_cutDecimals;
 
-private _elevation = (getPosATL vehicle _unit) select 2;
-_elevation = [_elevation, 0] call BIS_fnc_cutDecimals;
+	private _elevation = (getPosATL vehicle _unit) select 2;
+	_elevation = [_elevation, 0] call BIS_fnc_cutDecimals;
 
 
 	_text = format ["
@@ -76,7 +92,8 @@ _elevation = [_elevation, 0] call BIS_fnc_cutDecimals;
 		_elevation
 	];
 
-_text call canyonRun_fnc_flightDataStream;
+// Update the flight data display on other pilot's screens
+ [_text] remoteExec ["canyonRun_fnc_flightDataStream",-clientOwner];
 
 sleep 0.3;
 

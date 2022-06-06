@@ -1,11 +1,15 @@
 #define canyonRun_id_guiDialogMain 909
 #define canyonRun_id_guiDebugCheckbox 910
-#define canyonRun_id_selectPilot 911
+
 #define canyonRun_id_selectAircraft 912
 #define canyonRun_id_startRun 913
 #define canyonRun_id_nextPilot 914
 #define canyonRun_id_nextPilotDisplay 915
 #define canyonRun_id_buttonAutoQueue 916
+
+
+#define canyonRun_id_guiPilotList 917
+#define canyonRun_id_guiPilotListButton 918
 
 
 
@@ -54,14 +58,14 @@ class canyonRun_gui_dialogMain {
 	
 		class canyonRun_gui_nextPilotDisplay: canyonRun_RscText {
 			idc = canyonRun_id_nextPilotDisplay;
-			text = "current actor";
+			text = "current Pilot";
 			x = 0.3 * safezoneW + safezoneX;
 			y = 0.23 * safezoneH + safezoneY;
 			w = 0.4 * safezoneW;
 			h = 0.04 * safezoneH;
 			font = "PuristaMedium";
 			SizeEx = TEXT_SIZE_LARGE;
-			tooltip = "Shows what the current actor is set to";
+			tooltip = "Shows what the current Pilot is set to";
 		};
 
 		
@@ -86,25 +90,29 @@ class canyonRun_gui_dialogMain {
 		};
 		
 		
-		////////////////// pilot selection //////////////////
-		class canyonRun_gui_comboSelectPilot: canyonRun_RscCombo {
-			idc = canyonRun_id_selectPilot;
-			text = "set pilot";
-			x = 0.37 * safezoneW + safezoneX;
-			y = 0.55 * safezoneH + safezoneY;
-			tooltip = "Select next pilot";
-			onLBSelChanged = "[] call canyonRun_fnc_setPilot";
+
+		////////////////// Pilot selection //////////////////
+		
+		class canyonRun_gui_listPilot: canyonRun_RscListbox {
+			idc = canyonRun_id_guiPilotList;
+			x = 0.45 * safezoneW + safezoneX;
+			y = 0.28 * safezoneH + safezoneY;
+			w = 0.062 * safezoneW;
+			h = 0.319 * safezoneH;
+			onLBSelChanged = "[] call canyonRun_fnc_guiPlayerList";
 		};
 
-		class canyonRun_gui_textPilotSelection: canyonRun_RscText {
+		class canyonRun_gui_PilotListButton: canyonRun_RscButton {
 			idc = -1;
-			text = "pilot selection";
-			x = 0.3 * safezoneW + safezoneX;
-			y = 0.55 * safezoneH + safezoneY;
-			w = 0.06 * safezoneW;
-			h = 0.02 * safezoneH;
-			tooltip = "Select pilot that will go next";
+			text = "Set next pilot";
+			x = 0.45 * safezoneW + safezoneX;
+			y = 0.61 * safezoneH + safezoneY;
+			tooltip = "Set the selected player as Pilot";
+			action = "[] call canyonRun_fnc_guiPlayerListButton";
 		};
+
+
+
 
 		////////////////// aircraft selection //////////////////
 		class canyonRun_gui_comboSelectAircraft: canyonRun_RscCombo {
@@ -160,7 +168,7 @@ class canyonRun_gui_dialogMain {
 		////////////////// script info //////////////////
 		
 		class canyonRun_gui_scriptInfo: canyonRun_RscText {
-			idc = canyonRun_id_guiActorDisplay;
+			idc = canyonRun_id_guiPilotDisplay;
 			text = "canyonRun by woofer";
 			x = 0.575 * safezoneW + safezoneX;
 			y = 0.7 * safezoneH + safezoneY;

@@ -28,9 +28,9 @@ while {true} do { // for now no need to be able to stop this loop, people will h
 		// The timer has a different length depending on whether devMode is on or off
 		private _waitTime = 60;
 		if (canyonRun_var_devMode) then {
-			_waitTime = 6;
+			_waitTime = 20;
 		} else {
-			_waitTime = 30;
+			_waitTime = 40;
 		};
 
 		// Detect whether there is someone in the game master slot
@@ -43,13 +43,13 @@ while {true} do { // for now no need to be able to stop this loop, people will h
 
 		} else {
 
-			// Since there is no game master, the system need to run automatically
 			for "_i" from _waitTime to 1 step -1 do {
 				_pilotName = (canyonRun_var_playerList select 0) select 1;
-				hintSilent format ["Next pilot %1 to start in %2 seconds", _pilotName,_i];
+				_text = format ["<t color='#00ff00' size='2'>Next pilot %1 to start in %2 seconds</t>",_pilotName,_i];
+				[[_text, "PLAIN DOWN", 0.3, true, true]] remoteExec ["cutText",0];
 				sleep 1;
 			};
-			hintSilent ""; // Clear the hint
+			[["", "PLAIN DOWN", 0.3, true, true]] remoteExec ["cutText",0];
 
 		};
 

@@ -36,32 +36,79 @@ canyonRun_fnc_guiDebug = {
 
 
 
-// Populates the player list
-private _pilotSelection = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_selectPilot; // Define the displaycontrol
+
+/* ----------------------------------------------------------------------------------------------------
+									Player selection list
+   ---------------------------------------------------------------------------------------------------- */
+// Reset the player array
+canyonRun_var_guiPlayerListArray = [];
+
+// This will generate a list with live players excluding headless clients, but not the cameraman
+private _allHCs = entities "HeadlessClient_F";
+canyonRun_var_guiPlayerListArray = allPlayers - _allHCs;
+
+
+// Define the displaycontrol
+private _playerSelectionList = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_guiPilotList;
+
+// Populate the dialog control with the list to generate proper indexes.
+private _selectedIndex = 0;
+private _playerName = 0;
 {
-	_pilotSelection lbAdd ( _x select 1 );
-} forEach canyonRun_var_playerList;
+	// Show the short name of the player in the list
+	private _playerName = name _x;
+	_playerSelectionList lbAdd _playerName;
+} forEach canyonRun_var_guiPlayerListArray;
 
-// After loading gui, set the dropdown to it's current value
-lbSetCurSel [canyonRun_id_selectPilot, 0];
 
-// find out what the current value of the drop-down is
 
-canyonRun_fnc_setPilot = {
-	// Find the control
-	private _setPilot = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_selectPilot;
-	private _selectedPilot = lbCurSel _setPilot;	// Checks state of drop-down
-	_pilotArray = canyonRun_var_playerList select _selectedPilot;
-	// This is where we update playerlist so that the next selected pilot ends up at the very top of the list
-	private _uid = _pilotArray select 0;
+
+
+
+
+// This function is called by the eventhandler for the listbox in dialogs
+canyonRun_fnc_guiPlayerList = {
+	// Find out what was just selected in the list
+	_selectedIndex = lbCurSel canyonRun_id_guiPilotList; // lbCurSel returns -1 when nothing is selected
+	// Store the corresponding player in in variable
+	canyonRun_var_guiPlayerListSelectedPlayer = (canyonRun_var_guiPlayerListArray select _selectedIndex);
+};
+
+// This is called from the "actor" button at the player listbox
+canyonRun_fnc_guiPlayerListButton = {
+	// Set the selected player as the actor
+	systemchat "This is where the actor got selected";
+
+
+	// Set the next pilot based on what was last selected in the list
+	_uid = getPlayerUID canyonRun_var_guiPlayerListSelectedPlayer;
 	[_uid,"first"] call canyonRun_fnc_playerQueue;
 
-	// Update the text displaying next pilot
-	private _currentPilotDisplay = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_nextPilotDisplay; // Define the displaycontrol
-	_currentPilotDisplay ctrlSetText format ['Next pilot: %1', (_pilotArray select 1)];
 
-	systemchat str canyonRun_var_playerList;
+	// Update the text display naming the current actor
+	private _currentPilotDisplay = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_nextPilotDisplay; // Define the displaycontrol
+	_currentPilotDisplay ctrlSetText format ['Next pilot: %1', name canyonRun_var_guiPlayerListSelectedPlayer];
+
 };
+
+
+/*
+
+// If the actor is any of the selected players in the list, then select that player (otherwise, select none?)
+_checkArray = player in canyonRun_var_guiPlayerListArray;
+if (_checkArray) then {
+		_index = canyonRun_var_guiPlayerListArray find player;
+		_playerSelectionList lbSetCurSel _index;
+} else {
+	// Actor is not in array. Don't select anyone, or select the topmost unit.
+};
+
+*/
+
+
+
+
+
 
 
 
@@ -127,5 +174,7 @@ canyonRun_fnc_setAircraft = {
 private _currentPilotDisplay = (findDisplay canyonRun_id_guiDialogMain) displayCtrl canyonRun_id_nextPilotDisplay; // Define the displaycontrol
 private _pilotName = [canyonRun_var_playerList, [0,1]] call BIS_fnc_returnNestedElement;
 _currentPilotDisplay ctrlSetText format ['Next pilot: %1', _pilotName];
+
+
 
 

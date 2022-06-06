@@ -67,7 +67,11 @@ canyonRun_fnc_pointGate = {
 
 
 
-private _aircraftType = (canyonRun_var_playerList select 0) select 2;
+// Find the pilot that is to be put into their chosen aircraft
+private _index = ( [canyonRun_var_playerList, _pilotUID] call BIS_fnc_findNestedElement ) select 0;
+private _aircraftType = (canyonRun_var_playerList select _index) select 2;
+
+
 
 // If the current pilot is fully watching through the observation screen, turn that shit off.
 canyonrun_var_camera cameraEffect ["internal", "BACK","stream"];
@@ -176,8 +180,8 @@ canyonRun_fnc_outOfBounds = {
 
 
 // Start the flight data stream
-//[_pilot] spawn canyonRun_fnc_flightData;
-[_pilot] remoteExec ["canyonRun_fnc_flightData",0];
+[_pilot] spawn canyonRun_fnc_flightData;
+// [_pilot] remoteExec ["canyonRun_fnc_flightData",0];
 
 
 // ---------------------------------------- End of run ----------------------------------------

@@ -55,15 +55,15 @@ x Out of bounds mechanic
 x Fuel depletion mechanic
 
 Functionality for beta should be:
-- map tracking along with current fuel level and name (local on each client, I suppose)
+- map tracking
 - GUI for players selection of aircraft
 - kill messages (killed by enemy or crash)
 - JIP verification
-- Live monitoring of aircraft fuel level for all players
+x Live monitoring of aircraft fuel level for all players
 x game master
-- GUI for game master
+x GUI for game master
 - several aircraft
-- GUI for changing player queue order by game master
+x GUI for changing player queue order by game master
 - mission markers/explanations on map
 - scoreboard
 x instructions in diary
@@ -89,7 +89,6 @@ Functionality for release should be:
 //KNOWN- Point get audio is played on all clients
 //TODO- High score message for clients is shown only on server
 //TODO- CompileAll misses to recompile the gui - maybe compileInit and compileGui and compileAll
-//TODO- Test fnc_playerQueue to have it move people to next in queue
 //TODO- 
 //TODO- Update clientCode to work in SP conditions sith SP_PLAYER UID
 //TODO- Scenario should automatically go live when there is a game master in the slot
@@ -99,7 +98,6 @@ Functionality for release should be:
 //TODO- Move function compilation onto the server and publicVariable as needed
 //TODO- set a default aircraft that isn't from a DLC
 //TODO- No good for a party game if you can't distinguish between players. Make them dress diffrently
-//IDEA- Mark player crashes on the map in some good way - maybe the latest only?
 //IDEA- Gunner positions - let other people fly along
 //IDEA- Make camera use different spots for each section of the circuit
 //IDEA- TFAR pre-configured channels for aircraft and radios on pilots
@@ -113,43 +111,22 @@ Functionality for release should be:
 // ----------------------------------CURRENTLY AT:--------------------------------------
 /* 
 
-map markers. best bet for now seems to be drawPolygon or get back into the bog of icons
 
-GUI - need a list and button selection for next pilot as with indicam "set actor list"
-drop-down needs to update the text in the window top better. it's a bit hit or miss right now
-will likely get better with the new list system
-I seem to be able to break the aircraft selection in mp as well. I keep getting p1's plane
-update: looks like it's the sorting function. If i select same person the current pilot changes
-but only if i keep selecting number two in the list. index 0 keeps landing on p0
-actually only the second selection makes any changes
-
-I don't really want the selection from game master to overwrite each client's
+map markers for tracking. best bet for now seems to be drawPolygon or get back into the bog of icons
 
 Add a test that detects when the game master slot becomes empty. When detected:
 	- Show a warning that the game master has left
 	- Show a warning that the system will start looping games automatically in a minute
 	  or so unless the game master slot becomes occupied again.
 
-
-
 Put compiling of functions on the server, but publicVariable the ones that need to be
 local to each client. decide which goes where.
-
-Add variableEventhandler to all clients and server in order to keep the list of
 
 Add a test to each client that tests and possibly removes any aircraft classnames from the list
 that it hasn't got loaded - this to prevent the server giving options that the client can't use
 also tell the client that they do not have the same asset mods loaded as the server
 
-screen stream isn't running anymore it seems
-
-Flight data is now in for the player.
-Gonna need to decide if the player should be able to even see it, but it needs localization
-so that other player get to see it.
-Either the player does the calculation and sends over network, or each client will have to pull
-the info by themselves. not sure yet. I want it updating at 0.3 seconds. is that too much to
-send over the network?
-
+Might need a max height ASL too cause you can skirt the mountain tops on the inside of the second stretch
 
 */
 // ----------------------------------CURRENTLY AT:--------------------------------------
@@ -166,6 +143,7 @@ canyonRun_var_aircraft = "I_Plane_Fighter_04_F";
 canyonRun_var_pilot = player;
 canyonRun_var_scenarioLive = false;	// variable to start the scenario
 canyonRun_var_activeRun = false; // Used to indicate wether there is an active run currently going on
+canyonRun_var_autoRun = false;	// If true the mission will start runs automatically according to a timer shown on each client
 
 
 if (isServer) then {	// run on dedicated server or player host
@@ -339,8 +317,11 @@ if (hasInterface) then {	// run on all player clients including player host
 		   ------------------------------------------------------------------------------------------------------- */
 		// Define the function that is to run when the CBA bound key is pressed.
 		canyonRun_fnc_keyGUI = {
-			// Only open the dialog if it's not already open
-			if (isNull (findDisplay canyonRun_id_guiDialogMain)) then {createDialog "canyonRun_gui_dialogMain";} else {closeDialog 0};
+			
+			if (
+				isNull (findDisplay canyonRun_id_guiDialogMain) && // Only open the dialog if it's not already open
+				((typeof (vehicle player)) == "B_Fighter_Pilot_F") //  and as long as the player isn't actually flying
+				) then {createDialog "canyonRun_gui_dialogMain";} else {closeDialog 0};
 			["F1-key pressed.",true,true] call canyonRun_fnc_debug;
 		};
 
@@ -398,25 +379,30 @@ if (hasInterface) then {	// run on all player clients including player host
 		}
 	];
 
+	// Also temporary - Should be instructions in camp
+	canyonRun_var_screen addAction ["controls",{
+		createDialog "canyonRun_gui_dialogMain";
+	}];
 
 
+
+
+
+	// For now, scenario is live by default Can be started with the function below if we want it so in the future
+	missionNamespace setVariable ["canyonRun_var_scenarioLive", true, true];
 	// TEMPORARY: Should probably only be executed by the game master even though each player need to be able to choose aircraft
-	// Addaction to be removed and added into the GUI
-	canyonRun_var_spawnFlag addAction ["start scenario",{
+	canyonRun_fnc_startScenario = {
 		// Set the scenario loose by setting the varible to true and broadcasting it to all clients
 		missionNamespace setVariable ["canyonRun_var_scenarioLive", true, true];
 		
 		// Clearly display that the scenario is now live
 		{cutText ["<t color='#00ff00' size='4'>Scenario is LIVE!</t>", "PLAIN DOWN", 0.3, true, true]} remoteExec ["call",0];
+		};
 
-		// str _this = [object_var,activatingPlayer,actionID,<null>]
-		canyonRun_var_spawnFlag removeAction (_this select 2); // removes this addAction
-	}];
 
-	// Also temporary - Should be instructions in camp
-	canyonRun_var_spawnFlag addAction ["controls",{
-		createDialog "canyonRun_gui_dialogMain";
-	}];
+
+
+
 
 
 };	// End of hasInterface executed code
